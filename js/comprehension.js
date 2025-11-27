@@ -1,0 +1,89 @@
+// Comprehension check logic
+// Normalize condition string to handle case variations and whitespace
+function normalizeCondition(condition) {
+    if (!condition) return 'puzzleFirst';
+    const normalized = condition.trim().toLowerCase();
+    if (normalized === 'puzzlefirst') return 'puzzleFirst';
+    if (normalized === 'freeplayfirst') return 'freeplayFirst';
+    return condition.trim();
+}
+
+// Import condition to determine flow
+let condition = localStorage.getItem('experimentCondition') || 'puzzleFirst';
+condition = normalizeCondition(condition);
+console.log('Comprehension - Condition:', condition);
+
+const checkBtn = document.getElementById("check-btn");
+const checks = ["check1", "check2", "check3", "check4"];
+// Correct answers: b, b, c, b
+const answers = ["b", "b", "c", "b"];
+
+const passBtn = document.getElementById("pass-btn");
+const retryBtn = document.getElementById("retry-btn");
+
+checkBtn.onclick = () => checkComprehension();
+// Redirect based on condition
+passBtn.onclick = () => {
+    if (condition === 'freeplayFirst') {
+        location.href = "freeplay.html";
+    } else {
+        location.href = "task.html";
+    }
+};
+retryBtn.onclick = () => location.href = "instruction.html";
+
+// Prevent browser back button from bypassing the instructions
+// If user fails and tries to go back, redirect to instructions
+window.addEventListener('load', () => {
+    // Mark that the page has been visited
+    if (!sessionStorage.getItem('comprehension_visited')) {
+        sessionStorage.setItem('comprehension_visited', 'true');
+    }
+    
+    // Prevent going back to avoid re-attempting without reading instructions
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', () => {
+        // If user tries to go back, redirect to instructions
+        window.location.href = 'instruction.html';
+    });
+});
+
+document.getElementById("prequiz").onchange = () => {
+    if (isFilled()) {
+        checkBtn.disabled = false;
+    }
+};
+
+function checkComprehension() {
+    let allCorrect = true;
+    
+    for (let i = 0; i < checks.length; i++) {
+        const selected = document.querySelector(`input[name="${checks[i]}"]:checked`);
+        if (!selected || selected.value !== answers[i]) {
+            allCorrect = false;
+            break;
+        }
+    }
+    
+    showPostCheckPage(allCorrect);
+}
+
+function showPostCheckPage(isPass) {
+    document.getElementById("comprehension").style.display = "none";
+    
+    if (isPass) {
+        document.getElementById("pass").style.display = "block";
+    } else {
+        document.getElementById("retry").style.display = "block";
+    }
+}
+
+function isFilled() {
+    for (let i = 0; i < checks.length; i++) {
+        const selected = document.querySelector(`input[name="${checks[i]}"]:checked`);
+        if (!selected) {
+            return false;
+        }
+    }
+    return true;
+}

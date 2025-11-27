@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern DSL Experiment - Instructions</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="light-page">
+    <!-- Single Page with Progressive Content -->
+    <div id="main-page" class="instruction-page">
+        <h1>Pattern Language Experiment</h1>
+        <div class="instruction">
+            <p class="spacebar-hint" style="color: #f59e0b; font-style: italic; margin-bottom: 1.5rem; font-weight: 600;">
+                ⌨️ Press space bar to show each section
+            </p>
+            
+            <div id="progressive-content">
+                <!-- Section 1: Welcome -->
+                <div class="content-line hidden">
+                    <h2>Welcome!</h2>
+                </div>
+                <div class="content-line hidden">
+                    <p>In this experiment, you create visual patterns from some basic building blocks and operations.</p>
+                </div>
+                <div class="content-line hidden" id="activity-order-container">
+                    <!-- Dynamic content based on condition -->
+                </div>
+                
+                <!-- Section 2: How It Works -->
+                <div class="content-line hidden">
+                    <h2>How It Works</h2>
+                </div>
+                <div class="content-line hidden">
+                    <h3>The Pattern Crafter</h3>
+                    <p>On a 10×10 grid, you can:</p>
+                </div>
+                <div class="content-line hidden">
+                    <ol>
+                        <li>Select shapes and operations from the menu</li>
+                    </ol>
+                </div>
+                <div class="content-line hidden">
+                    <ol start="2">
+                        <li>Watch your pattern update in real-time as you build</li>
+                    </ol>
+                </div>
+                <div class="content-line hidden">
+                    <ol start="3">
+                        <li>Preview your result before submitting</li>
+                    </ol>
+                </div>
+                <div class="content-line hidden">
+                    <ol start="4">
+                        <li id="submit-instruction"><!-- Dynamic based on condition --></li>
+                    </ol>
+                </div>
+                
+                <!-- Section 4: Helpers -->
+                <div class="content-line hidden">
+                    <h3>Creating Reusable Building Blocks</h3>
+                </div>
+                <div class="content-line hidden">
+                    <p>Here's where it gets interesting: as you work, you might notice that certain patterns or sub-patterns could be useful later.</p>
+                </div>
+                <div class="content-line hidden">
+                    <p>You can save any pattern you create to your personal collection:</p>
+                </div>
+                <div class="content-line hidden">
+                    <ul>
+                        <li>Saved patterns appear as visual thumbnails you can see and select</li>
+                    </ul>
+                </div>
+                <div class="content-line hidden">
+                    <ul>
+                        <li>These saved patterns carry forward to all future tasks</li>
+                    </ul>
+                </div>
+                <div class="content-line hidden">
+                    <ul>
+                        <li>You can use them as building blocks in more complex patterns</li>
+                    </ul>
+                </div>
+                <div class="content-line hidden">
+                    <ul>
+                        <li>Think of them as creating your own custom "super-shapes"</li>
+                    </ul>
+                </div>
+                
+                <!-- Section 5: Strategy Tip -->
+                <div class="content-line hidden">
+                    <div style="background: #fef3c7; padding: 1.25rem; border-left: 4px solid #f59e0b; border-radius: 4px; margin: 1.5rem 0;">
+                        <p style="margin: 0; color: #92400e;"><strong>Strategy tip:</strong> The patterns may get progressively more complex. Patterns you save early on might become useful shortcuts later!</p>
+                    </div>
+                </div>
+                
+                <!-- Section 6: No Pressure -->
+                <div class="content-line hidden">
+                    <p>We're interested in understanding how people break down complex visual problems and build reusable solutions. There are no right or wrong approaches—work in whatever way feels natural to you.</p>
+                </div>
+                <div class="content-line hidden">
+                    <ul>
+                        <li>There's <strong>no time limit</strong>—work at your own pace</li>
+                    </ul>
+                </div>
+                <div class="content-line hidden">
+                    <ul>
+                        <li>How exactly you build your solution does not matter—use as many or as few steps as you need</li>
+                    </ul>
+                </div>
+                <div class="content-line hidden">
+                    <ul>
+                        <li>You'll see your progress throughout</li>
+                    </ul>
+                </div>
+                
+                <!-- Section 7: Next Steps -->
+                <div class="content-line hidden">
+                    <h2>Next Steps</h2>
+                </div>
+                <div class="content-line hidden">
+                    <p>You'll start with an interactive tutorial that shows you how Pattern Crafter works.</p>
+                </div>
+                <div class="content-line hidden">
+                    <p style="margin-top: 2rem;"><strong>Ready to begin? Let's start with the tutorial!</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="button-group">
+            <button class="big-button" id="tutorial-btn" style="display: none;">Start Tutorial >></button>
+        </div>
+    </div>
+    
+    <script type="module" src="../js/instruction.js"></script>
+</body>
+</html>
