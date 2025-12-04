@@ -1935,8 +1935,8 @@ function initializeApp() {
     // Initialize workspace
     renderPattern(currentPattern, 'workspace');
     
-    // Seed with add(blank, ?) like in task mode
-    seedAddPreviewWithBlankOperand();
+    // 移除默认的 add(blank, operandB) 预览
+    // seedAddPreviewWithBlankOperand();
 }
 
 function initializePreviewControllers() {

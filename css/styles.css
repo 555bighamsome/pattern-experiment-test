@@ -85,12 +85,22 @@
 body {
     font-family: var(--font-sans);
     min-height: 100vh;
+    overflow: hidden; /* 防止出现滚动条 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Magic Stones inspired page styles */
 .light-page, .dark-page {
     margin: 0;
-    padding: 4em 15%;
+    padding: 0; /* 移除padding以适应固定尺寸 */
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .light-page {
@@ -383,26 +393,31 @@ body:has(#experimentContent) {
 .progress-bar {
     background: #1f2937;
     color: white;
-    padding: 0.55rem 1.5rem;
+    padding: 0.5rem 1.2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: 1.2rem;
     box-shadow: none;
-    width: min(100%, var(--layout-max-width));
+    width: 1200px;
+    min-width: 1200px;
+    max-width: 1200px;
     margin: 0 auto;
-    min-height: 48px;
+    min-height: 45px;
+    max-height: 45px;
+    flex-shrink: 0;
 }
 
 .progress-info {
     font-weight: 600;
     font-size: 0.9rem;
     letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
 .progress-track {
     flex: 1;
-    max-width: 540px;
+    max-width: 600px;
     height: 8px;
     border-radius: 0;
     background: rgba(255, 255, 255, 0.18);
@@ -416,39 +431,46 @@ body:has(#experimentContent) {
 }
 
 #experimentContent {
-    width: var(--layout-max-width);
-    min-width: var(--layout-max-width);
-    max-width: var(--layout-max-width);
+    width: 1200px;
+    min-width: 1200px;
+    max-width: 1200px;
+    height: 750px; /* 固定高度：进度条45px + 内容区域705px */
+    min-height: 750px;
+    max-height: 750px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.25rem;
+    gap: 0.6rem;
     margin: 0 auto;
-    transform: scale(var(--ui-scale));
-    transform-origin: top center;
+    transform-origin: center center;
+    /* 缩放将通过 JavaScript 动态计算 */
 }
 
 .content-area {
     display: grid;
-    /* Optimized: 250+250+250+380 = 1130px + 3×1rem gaps = 1190px */
-    grid-template-columns: var(--layout-columns, 250px 250px 250px 380px);
-    /* Fixed header row height and main content height */
-    grid-template-rows: var(--layout-rows, var(--header-row-height) 560px);
-    /* Use four distinct columns so preview aligns with controls and program */
+    /* 固定4列布局，总宽度1200px（270+270+210+380 + 间隙） */
+    grid-template-columns: 270px 270px 210px 380px;
+    /* 固定行高：头部125px + 主内容565px */
+    grid-template-rows: 125px 565px;
+    /* 保持4列布局 */
     grid-template-areas:
         "points preview controls program"
         "target workspace controls program";
-    width: var(--layout-max-width);
-    padding: 1rem;
+    width: 1200px;
+    min-width: 1200px;
+    max-width: 1200px;
+    height: 700px;
+    padding: 0.85rem;
     box-sizing: border-box;
-    gap: 1rem;
+    gap: 0.85rem;
     margin: 0 auto;
+    flex: 1;
 }
 
 .panel-card {
     background: var(--color-surface);
     border-radius: 0;
-    padding: 0.9rem;
+    padding: 0.65rem;
     box-shadow: none;
     border: 1px solid var(--color-border);
     display: flex;
@@ -488,25 +510,22 @@ body:has(#experimentContent) {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: var(--header-row-height);
-    min-height: var(--header-row-height);
-    max-height: var(--header-row-height);
-    padding: 0.65rem;
+    height: 100%;
+    padding: 0.75rem;
     color: #0f172a;
     text-align: center;
-    max-width: 250px;
     width: 100%;
     justify-self: start;
 }
 .points-label {
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
 }
 .points-value {
-    margin-top: 0.5rem;
-    font-size: 2.6rem;
+    margin-top: 0.6rem;
+    font-size: 2.8rem;
     font-weight: 800;
     line-height: 1;
     font-family: var(--font-mono);
@@ -526,13 +545,13 @@ body:has(#experimentContent) {
 }
 
 .panel-title {
-    font-size: 1rem;
-    margin-bottom: 0.9rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.55rem;
 }
 
 .panel-subtitle {
-    font-size: 0.82rem;
-    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
     text-transform: uppercase;
     color: #334155;
     letter-spacing: 0.08em;
@@ -547,26 +566,26 @@ body:has(#experimentContent) {
     background: #ffffff;
     border-radius: 0;
     border: 1px solid var(--color-border);
-    padding: 0.8rem;
-    min-height: 280px;
+    padding: 0.6rem;
+    min-height: 200px;
 }
 
 .workspace-canvas svg,
 .pattern-view svg {
     max-width: 100%;
     max-height: 100%;
-    width: 200px;
-    height: 200px;
+    width: 170px;
+    height: 170px;
     object-fit: contain;
 }
 
 /* Program panel --------------------------------------------------- */
 
 .program-card {
-    padding: 0.85rem 0.9rem 1.25rem; /* give a bit more space at the bottom */
+    padding: 0.65rem 0.65rem 0.85rem; /* give a bit more space at the bottom */
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 0.6rem;
     min-width: 0;
     max-height: 100%;
     overflow: hidden;
@@ -576,15 +595,15 @@ body:has(#experimentContent) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    padding-bottom: 0.65rem;
+    gap: 0.6rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--color-border);
     flex-shrink: 0;
 }
 
 .program-header h3 {
     margin-right: auto;
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     color: #334155;
@@ -597,9 +616,9 @@ body:has(#experimentContent) {
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
-    padding-right: 0.35rem;
-    padding-bottom: 0.6rem; /* extra breathing room at bottom */
+    gap: 0.5rem;
+    padding-right: 0.3rem;
+    padding-bottom: 0.5rem; /* extra breathing room at bottom */
     min-height: 0;
     scroll-behavior: smooth;
 }
@@ -625,8 +644,8 @@ body:has(#experimentContent) {
 .operation-thumb {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.55rem 2.8rem 0.55rem 0.6rem;
+    gap: 0.5rem;
+    padding: 0.45rem 2.2rem 0.45rem 0.5rem;
     border-radius: 0;
     border: 1px solid rgba(148, 163, 184, 0.4);
     background: #ffffff;
@@ -787,8 +806,8 @@ body:has(#experimentContent) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--binary-operand-size, 72px);
-    height: var(--binary-operand-size, 72px);
+    width: var(--binary-operand-size, 62px);
+    height: var(--binary-operand-size, 62px);
     border-radius: 0;
     background: #ffffff;
     border: 1px solid #cbd5e1;
@@ -803,7 +822,7 @@ body:has(#experimentContent) {
 
 .program-expr-label {
     font-family: var(--font-mono);
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     color: #475569;
     opacity: 0.75;
     display: inline-flex;
@@ -871,21 +890,21 @@ body:has(#experimentContent) {
 .operations-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.55rem;
+    gap: 0.45rem;
 }
 
 .primitives-grid-inline {
     display: grid;
-    grid-template-columns: repeat(3, minmax(68px, 1fr));
-    gap: 0.55rem;
-    padding: 0.55rem;
+    grid-template-columns: repeat(3, minmax(56px, 1fr));
+    gap: 0.45rem;
+    padding: 0.45rem;
     border-radius: 0;
     background: transparent;
     border: none;
     min-height: 0;
     flex: 1 1 auto;
-    max-height: 420px; /* allow many items with scroll */
-    min-height: 100px;
+    max-height: 360px; /* allow many items with scroll */
+    min-height: 120px;
     overflow-y: auto;
     overflow-x: hidden;
     justify-items: center;
@@ -988,10 +1007,10 @@ body:has(#experimentContent) {
 .primitive-btn {
     border: 1px solid #cbd5e1;
     border-radius: 0;
-    padding: 0.45rem 0.7rem;
+    padding: 0.4rem 0.6rem;
     background: #f8fafc;
     color: #1f2937;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 500;
     text-transform: none;
     letter-spacing: 0;
@@ -1002,7 +1021,7 @@ body:has(#experimentContent) {
     align-items: center;
     justify-content: center;
     gap: 0.25rem;
-        min-height: 48px; /* Changed to restore general button minimum height */
+    min-height: 38px;
 }
 
 .btn:hover,
@@ -1042,16 +1061,16 @@ body:has(#experimentContent) {
 }
 
 .primitive-btn {
-    min-height: 52px;
+    min-height: 54px;
     border-radius: 0;
     background: #f8fafc;
     border-color: #cbd5e1;
-    padding: 0.4rem;
+    padding: 0.5rem;
 }
 
 .primitive-btn svg {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
 }
 
 .primitive-btn.selected {
@@ -1182,8 +1201,8 @@ body:has(#experimentContent) {
 }
 
 .operand-box {
-    width: var(--binary-operand-size, 72px);
-    height: var(--binary-operand-size, 72px);
+    width: var(--binary-operand-size, 62px);
+    height: var(--binary-operand-size, 62px);
     border-radius: 0;
     border: 1px solid #cbd5e1;
     background: #ffffff;
@@ -1498,10 +1517,11 @@ body:has(#experimentContent) {
 }
 
 /* ------------------------------------------------------------------
-   Responsive adjustments
+   Responsive adjustments - DISABLED to maintain fixed 4-column layout
 ------------------------------------------------------------------- */
 
-@media (max-width: 1400px) {
+/* 禁用响应式布局变化，保持固定4列布局 */
+/* @media (max-width: 1400px) {
     body {
         overflow-y: auto;
     }
@@ -1542,9 +1562,9 @@ body:has(#experimentContent) {
         grid-template-columns: repeat(3, minmax(68px, 1fr));
         padding: 0.45rem;
     }
-}
+} */
 
-@media (max-width: 1024px) {
+/* @media (max-width: 1024px) {
     .content-area {
         grid-template-columns: minmax(0, 1fr);
         grid-template-rows: repeat(6, auto);
@@ -1580,9 +1600,9 @@ body:has(#experimentContent) {
     .binary-preview-footer {
         justify-content: center;
     }
-}
+} */
 
-@media (max-width: 900px) {
+/* @media (max-width: 900px) {
     .content-area {
         padding: 0.9rem 1rem 1.1rem;
     }
@@ -1602,9 +1622,9 @@ body:has(#experimentContent) {
         max-height: none;
         overflow: visible;
     }
-}
+} */
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     .progress-bar {
         flex-direction: column;
         align-items: stretch;
@@ -1644,9 +1664,9 @@ body:has(#experimentContent) {
     .primitive-btn {
         min-height: 0;
     }
-}
+} */
 
-@media (max-width: 640px) {
+/* @media (max-width: 640px) {
     .welcome-screen {
         align-items: flex-start;
         padding: 1.5rem 0;
@@ -1692,10 +1712,11 @@ body:has(#experimentContent) {
     .binary-preview-footer {
         gap: 0.6rem;
     }
-}
+} */
 
-/* Responsive scaling: adjust --ui-scale for smaller viewports */
-@media (max-width: 1400px) {
+/* Responsive scaling: 缩放由JavaScript动态控制，保持固定布局 */
+/* 移除所有自动缩放的媒体查询，改用JavaScript计算 */
+/* @media (max-width: 1400px) {
     :root { --ui-scale: 0.85; }
 }
 
@@ -1758,7 +1779,7 @@ body:has(#experimentContent) {
     .binary-preview-footer .btn {
         width: 100%;
     }
-}
+} */
 
 /* Modal System (Ethics, Instruction, Comprehension) ----------------------------------- */
 
@@ -1946,13 +1967,13 @@ body:has(#experimentContent) {
     flex: 0 0 auto;
 }
 
-/* Button Styles */
+/* Button Styles - 优化为1037px布局 */
 .btn {
-    padding: 0.7rem 1.5rem;
-    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
     font-weight: 600;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: var(--font-sans);
