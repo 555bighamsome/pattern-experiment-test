@@ -97,12 +97,9 @@
     <div id="experimentContent">
         <div class="progress-bar" style="display: flex; justify-content: space-between; align-items: center;">
             <div class="progress-info">
-                Free Play Mode - Create and Save Your Patterns
+                Free Play Mode
             </div>
             <div style="display: flex; gap: 0.5rem;">
-                <button id="previousTrialBtn" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; display: none; background: #3b82f6; color: white; border: none;">
-                    ← View Previous
-                </button>
                 <button class="btn" onclick="viewGallery()" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #8b5cf6; color: white; border: none;">
                     View Gallery
                 </button>
@@ -160,8 +157,8 @@
                         <button id="bin-subtract" data-op="subtract" class="transform-btn binary-btn" onclick="selectBinaryOp('subtract')" title="Subtract one pattern from another">
                             <span class="btn-text">subtract</span>
                         </button>
-                        <button id="bin-union" data-op="union" class="transform-btn binary-btn" onclick="selectBinaryOp('union')" title="Union/AND two patterns">
-                            <span class="btn-text">union</span>
+                        <button id="bin-overlap" data-op="overlap" class="transform-btn binary-btn" onclick="selectBinaryOp('overlap')" title="Overlap/AND two patterns">
+                            <span class="btn-text">overlap</span>
                         </button>
                         <button class="transform-btn unary-btn" data-op="invert" onclick="applyTransform('invert')" title="Invert pattern (flip black/white)">
                             <span class="btn-text">invert</span>

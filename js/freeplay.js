@@ -1384,7 +1384,7 @@ function renderWorkflow() {
         const opText = item.operation || '';
         entry.onclick = () => onWorkflowClick(idx);
         
-        const binaryMatch = opText.match(/^(add|subtract|union)\((.*)\)$/);
+        const binaryMatch = opText.match(/^(add|subtract|overlap)\((.*)\)$/);
         const unaryOps = new Set(['invert', 'reflect_horizontal', 'reflect_vertical', 'reflect_diag']);
         const isUnary = item.opFn && unaryOps.has(item.opFn);
         
@@ -1936,7 +1936,7 @@ function updateInlinePreviewPanel() {
         const opMessages = {
             add: { hint: 'ADD – combine two patterns and keep all filled cells.' },
             subtract: { hint: 'SUBTRACT – choose a base pattern, then remove the second.' },
-            union: { hint: 'UNION – keep only the overlapping cells from both patterns.' }
+            overlap: { hint: 'OVERLAP – keep only the overlapping cells from both patterns.' }
         };
         const opConfig = opMessages[pendingBinaryOp] || opMessages.add;
         title.textContent = opConfig.hint;
@@ -2046,7 +2046,7 @@ function updateAllButtonStates() {
     });
     
     // Binary buttons
-    const bins = ['add','subtract','union'];
+    const bins = ['add','subtract','overlap'];
     bins.forEach(name => {
         const btn = document.getElementById('bin-' + name);
         if (!btn) return;
@@ -2166,6 +2166,15 @@ function registerKeyboardShortcuts() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if we need to clear favorites when switching from puzzle to freeplay
+    if (localStorage.getItem('clearFavoritesOnLoad') === 'true') {
+        localStorage.removeItem('favorites');
+        localStorage.removeItem('patternHelpers');
+        favorites = [];
+        localStorage.removeItem('clearFavoritesOnLoad');
+        console.log('Cleared favorites/helpers when switching from puzzle to freeplay phase');
+    }
+    
     initializeApp();
     
     // Initialize previous trial button
@@ -2393,6 +2402,9 @@ function downloadCombinedData() {
             completionTime: new Date().toISOString()
         };
         localStorage.setItem('freeplayExperimentData', JSON.stringify(sessionData));
+        
+        // Clear helpers when switching from freeplay to puzzle
+        localStorage.setItem('clearFavoritesOnLoad', 'true');
         
         // Redirect to task phase
         showToast('Moving to puzzle-solving phase...', 'info', 2000);

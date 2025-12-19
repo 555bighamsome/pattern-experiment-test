@@ -44,7 +44,7 @@ const practiceExercises = [
         ]
     },
     {
-        name: "Practice 2: Union Pattern",
+        name: "Practice 2: Overlap Pattern",
         generate: () => [
             [0,0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0,0,0],
@@ -414,7 +414,7 @@ function useFavoritePattern(id, pattern) {
         showToast('Filled unary input from Favorites', 'info', 1600);
         renderFavoritesShelf();
     } else {
-        showToast('⚠️ Please select an operation (binary or unary) before using a helper.', 'warning');
+        showToast('⚠️ Please select an operation first before using a helper.', 'warning');
     }
     checkTutorialProgress();
     if (!pendingBinaryOp && !pendingUnaryOp) {
@@ -700,9 +700,9 @@ function applyPrimitive(name) {
         pendingUnary: !!pendingUnaryOp
     });
 
-    // Primitives provide operands for pending operations (binary or unary)
+    // Primitives provide operands for pending operations
     if (!pendingBinaryOp && !pendingUnaryOp) {
-        showToast('⚠️ Please select an operation (binary or unary) before choosing a primitive.', 'warning');
+        showToast('⚠️ Please select an operation first before choosing a primitive.', 'warning');
         return;
     }
 
@@ -907,7 +907,7 @@ function renderWorkflow() {
         entry.onclick = () => onWorkflowClick(idx);
 
         // If operation is in function format like 'add(selected)' or 'add(W1,W2)'
-        const binaryMatch = opText.match(/^(add|subtract|union)\((.*)\)$/);
+        const binaryMatch = opText.match(/^(add|subtract|overlap)\((.*)\)$/);
         const unaryOps = new Set(['invert', 'reflect_horizontal', 'reflect_vertical', 'reflect_diag']);
         const isUnary = item.opFn && unaryOps.has(item.opFn);
         if (binaryMatch) {
@@ -1258,7 +1258,7 @@ function updateAllButtonStates() {
     
     // === BINARY BUTTONS ===
     // Always enabled - user can decide to do binary operations at any time
-    const bins = ['add','subtract','union'];
+    const bins = ['add','subtract','overlap'];
     bins.forEach(name => {
         const btn = document.getElementById('bin-' + name);
         if (!btn) return;
@@ -1695,9 +1695,9 @@ function updateInlinePreviewPanel() {
                 label: 'SUBTRACT',
                 hint: 'SUBTRACT – choose a base pattern, then remove the second.'
             },
-            union: {
-                label: 'UNION',
-                hint: 'UNION – keep only the overlapping cells from both patterns.'
+            overlap: {
+                label: 'OVERLAP',
+                hint: 'OVERLAP – keep only the overlapping cells from both patterns.'
             }
         };
         const opConfig = opMessages[pendingBinaryOp] || opMessages.add;
@@ -2067,8 +2067,20 @@ const tutorialSteps = [
         checkCompletion: null
     },
     {
-        title: "Step 1: Select an Operation",
-        content: `<p>You must <em>first select an operation</em>, then provide input(s).</p>
+        title: "Understanding Operations",
+        content: `<p>Operations are divided into two types:</p>
+            <ul>
+                <li><strong>One-input operations:</strong> invert, flip_h, flip_v, flip_d</li>
+                <li><strong>Two-input operations:</strong> add, subtract, overlap</li>
+            </ul>
+            <p>You'll practice both types in this tutorial!</p>`,
+        onEnter: () => highlightTutorialElement('.operations-section'),
+        waitForAction: false,
+        checkCompletion: null
+    },
+    {
+        title: "Step 1: Select an Operation (One-input)",
+        content: `<p>Let's start with a <strong>one-input operation</strong>.</p>
             <p><strong>Task:</strong> Click <strong>invert</strong> in Operations.</p>
             <p><em style="color: #fbbf24;">"Next" appears after you click invert.</em></p>`,
         onEnter: () => highlightTutorialElement('.operations-section'),
@@ -2104,12 +2116,12 @@ const tutorialSteps = [
         }
     },
     {
-        title: "Try a Binary Operation",
-        content: `<p><strong>Task:</strong> Complete a binary operation!</p>
+        title: "Step 4: Try a Two-input Operation",
+        content: `<p>Now let's try a <strong>two-input operation</strong>!</p>
             <ol>
                 <li>Click <strong>add</strong></li>
-                <li>Click <strong>any primitive</strong> (operand A)</li>
-                <li>Click <strong>another primitive</strong> (operand B)</li>
+                <li>Click <strong>any primitive</strong> (first input)</li>
+                <li>Click <strong>another primitive</strong> (second input)</li>
                 <li>Click <strong>✓ Confirm</strong></li>
             </ol>
             <p><em style="color: #fbbf24;">"Next" when complete.</em></p>`,
@@ -2129,7 +2141,6 @@ const tutorialSteps = [
     {
         title: "Using Reset",
         content: `<p>If you make a mistake, click <strong>⟲ Reset</strong> to cancel a pending operation.</p>
-            <p><strong>Try:</strong> Click an operation, then <strong>⟲ Reset</strong>.</p>
             <p>This is optional - just know it's there if you need it!</p>`,
         onEnter: () => {
             removeTutorialHighlight();
@@ -2251,7 +2262,7 @@ const tutorialSteps = [
         title: "Complete!",
         content: `<p>You've learned the basics:</p>
             <ul>
-                <li>✓ <strong>Operations:</strong> Binary (add, subtract, union) & Unary (invert, flip_h, flip_v, flip_d)</li>
+                <li>✓ <strong>Operations:</strong> Two-input operations (add, subtract, overlap) & One-input operations (invert, flip_h, flip_v, flip_d)</li>
                 <li>✓ <strong>Workflow:</strong> Select an operation → Select primitive(s) → Preview → Confirm</li>
                 <li>✓ <strong>Reset:</strong> Cancel operations</li>
                 <li>✓ <strong>Helpers:</strong> Save and reuse patterns</li>

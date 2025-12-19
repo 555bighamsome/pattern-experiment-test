@@ -243,6 +243,9 @@ function enterFreePlayMode() {
     localStorage.setItem('taskExperimentData', JSON.stringify(allTrialsData));
     localStorage.setItem('taskCompletionTime', new Date().toISOString());
     
+    // Clear helpers when switching from puzzle to freeplay
+    localStorage.setItem('clearFavoritesOnLoad', 'true');
+    
     console.log('Redirecting to freeplay...');
     window.location.href = 'freeplay.html';
 }
@@ -1100,7 +1103,7 @@ function renderWorkflow() {
         entry.onclick = () => onWorkflowClick(idx);
 
         // If operation is in function format like 'add(selected)' or 'add(W1,W2)'
-        const binaryMatch = opText.match(/^(add|subtract|union)\((.*)\)$/);
+        const binaryMatch = opText.match(/^(add|subtract|overlap)\((.*)\)$/);
         const unaryOps = new Set(['invert', 'reflect_horizontal', 'reflect_vertical', 'reflect_diag']);
         const isUnary = item.opFn && unaryOps.has(item.opFn);
         if (binaryMatch) {
@@ -1451,7 +1454,7 @@ function updateAllButtonStates() {
     
     // === BINARY BUTTONS ===
     // Always enabled - user can decide to do binary operations at any time
-    const bins = ['add','subtract','union'];
+    const bins = ['add','subtract','overlap'];
     bins.forEach(name => {
         const btn = document.getElementById('bin-' + name);
         if (!btn) return;
@@ -1888,9 +1891,9 @@ function updateInlinePreviewPanel() {
                 label: 'SUBTRACT',
                 hint: 'SUBTRACT – choose a base pattern, then remove the second.'
             },
-            union: {
-                label: 'UNION',
-                hint: 'UNION – keep only the overlapping cells from both patterns.'
+            overlap: {
+                label: 'OVERLAP',
+                hint: 'OVERLAP – keep only the overlapping cells from both patterns.'
             }
         };
         const opConfig = opMessages[pendingBinaryOp] || opMessages.add;
@@ -2355,6 +2358,15 @@ function registerKeyboardShortcuts() {
 
 // Run on initial load: initialize and auto-start
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if we need to clear favorites when switching from freeplay to puzzle
+    if (localStorage.getItem('clearFavoritesOnLoad') === 'true') {
+        localStorage.removeItem('favorites');
+        localStorage.removeItem('patternHelpers');
+        favorites = [];
+        localStorage.removeItem('clearFavoritesOnLoad');
+        console.log('Cleared favorites/helpers when switching from freeplay to puzzle phase');
+    }
+    
     initializeApp();
     startExperiment();
     

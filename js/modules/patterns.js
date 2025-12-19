@@ -39,7 +39,7 @@ const geomDSL = {
 const transDSL = {
     subtract: (a, b) => a.map((row, i) => row.map((val, j) => (val && !b[i][j] ? 1 : 0))),
     add: (a, b) => a.map((row, i) => row.map((val, j) => (val || b[i][j] ? 1 : 0))),
-    union: (a, b) => a.map((row, i) => row.map((val, j) => (val && b[i][j] ? 1 : 0))),
+    overlap: (a, b) => a.map((row, i) => row.map((val, j) => (val && b[i][j] ? 1 : 0))),
     invert: (a) => a.map((row) => row.map((val) => (val ? 0 : 1))),
     reflect_horizontal: (a) => [...a].reverse(),
     reflect_vertical: (a) => a.map((row) => [...row].reverse()),
@@ -125,7 +125,7 @@ function renderPattern(pattern, containerId, options = {}) {
             newCell: '#22d3ee',
             ghost: 'rgba(249, 115, 22, 0.2)'
         },
-        union: {
+        overlap: {
             overlap: '#9333ea',
             onlyBase: '#3b82f6',
             onlyOther: '#facc15',
@@ -172,18 +172,18 @@ function renderPattern(pattern, containerId, options = {}) {
                     } else {
                         rect.setAttribute('fill', 'transparent');
                     }
-                } else if (diffMode === 'union') {
+                } else if (diffMode === 'overlap') {
                     if (cell && baseVal) {
-                        rect.setAttribute('fill', palette.union.overlap);
+                        rect.setAttribute('fill', palette.overlap.overlap);
                         rect.setAttribute('fill-opacity', '0.85');
                     } else if (cell && !baseVal) {
-                        rect.setAttribute('fill', palette.union.onlyOther);
+                        rect.setAttribute('fill', palette.overlap.onlyOther);
                         rect.setAttribute('fill-opacity', '0.95');
                     } else if (!cell && baseVal) {
-                        rect.setAttribute('fill', palette.union.onlyBase);
+                        rect.setAttribute('fill', palette.overlap.onlyBase);
                         rect.setAttribute('fill-opacity', '0.82');
                     } else {
-                        rect.setAttribute('fill', palette.union.ghost);
+                        rect.setAttribute('fill', palette.overlap.ghost);
                     }
                 }
             } else {
