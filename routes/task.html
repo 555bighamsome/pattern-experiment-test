@@ -15,13 +15,8 @@
             <div class="progress-track">
                 <div class="progress-fill" id="progressFill" style="width: 4%"></div>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <div class="progress-info">
-                    <span id="percentComplete">4%</span> Complete
-                </div>
-                <button id="previousTrialBtn" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; display: none; background: #3b82f6; color: white; border: none;">
-                    ← View Previous
-                </button>
+            <div class="progress-info">
+                <span id="percentComplete">4%</span> Complete
             </div>
         </div>
 
@@ -80,8 +75,8 @@
                         <button id="bin-subtract" data-op="subtract" class="transform-btn binary-btn" onclick="selectBinaryOp('subtract')" title="Subtract one pattern from another">
                             <span class="btn-text">subtract</span>
                         </button>
-                        <button id="bin-union" data-op="union" class="transform-btn binary-btn" onclick="selectBinaryOp('union')" title="Union/AND two patterns">
-                            <span class="btn-text">union</span>
+                        <button id="bin-overlap" data-op="overlap" class="transform-btn binary-btn" onclick="selectBinaryOp('overlap')" title="Overlap/AND two patterns">
+                            <span class="btn-text">overlap</span>
                         </button>
                         <button class="transform-btn unary-btn" data-op="invert" onclick="applyTransform('invert')" title="Invert pattern (flip black/white)">
                             <span class="btn-text">invert</span>

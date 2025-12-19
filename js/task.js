@@ -243,6 +243,11 @@ function enterFreePlayMode() {
     localStorage.setItem('taskExperimentData', JSON.stringify(allTrialsData));
     localStorage.setItem('taskCompletionTime', new Date().toISOString());
     
+    // Clear operationsHistory and favorites before switching phases
+    // This ensures a clean start for the freeplay phase
+    localStorage.setItem('clearHistoryOnLoad', 'true');
+    localStorage.setItem('clearFavoritesOnLoad', 'true');
+    
     console.log('Redirecting to freeplay...');
     window.location.href = 'freeplay.html';
 }
@@ -608,7 +613,7 @@ function useFavoritePattern(id, pattern) {
         showToast('Filled unary input from Favorites', 'info', 1600);
         renderFavoritesShelf();
     } else {
-        showToast('⚠️ Please select an operation (binary or unary) before using a helper.', 'warning');
+        showToast('⚠️ Please select an operation first before using a helper.', 'warning');
     }
     checkTutorialProgress();
     if (!pendingBinaryOp && !pendingUnaryOp) {
@@ -805,10 +810,28 @@ function loadTrial(index) {
     const actualIndex = testOrder[currentTestIndex];
     targetPattern = testCases[actualIndex].generate();
     renderPattern(targetPattern, 'targetPattern');
-    // clear workspace and workflow/log for the new trial
-    resetWorkspace();
-    // start with a blank canvas in the workspace by default (do not log blank)
+    
+    // DO NOT clear operationsHistory - keep cumulative history across trials
+    // Only clear workspace pattern and current operation state
+    // resetWorkspace(); // REMOVED - was clearing operationsHistory
+    
+    // Clear current operation state but keep operationsHistory
     currentPattern = geomDSL.blank();
+    // operationsHistory = []; // REMOVED - keep cumulative
+    workflowSelections = [];
+    pendingBinaryOp = null;
+    pendingUnaryOp = null;
+    previewPattern = null;
+    previewBackupPattern = null;
+    resetInlinePreviewState();
+    resetUnaryPreviewState();
+    setWorkspaceGlow(false);
+    updateOperationsLog();
+    renderWorkflow();
+    updateAllButtonStates();
+    updateInlinePreviewPanel();
+    
+    // Render blank workspace
     renderPattern(currentPattern, 'workspace', {
         diffMode: pendingBinaryOp,
         basePattern: previewBackupPattern?.pattern
@@ -896,7 +919,7 @@ function applyPrimitive(name) {
 
     // Primitives provide operands for pending operations (binary or unary)
     if (!pendingBinaryOp && !pendingUnaryOp) {
-        showToast('⚠️ Please select an operation (binary or unary) before choosing a primitive.', 'warning');
+        showToast('⚠️ Please select an operation first before choosing a primitive.', 'warning');
         return;
     }
 
@@ -1100,7 +1123,7 @@ function renderWorkflow() {
         entry.onclick = () => onWorkflowClick(idx);
 
         // If operation is in function format like 'add(selected)' or 'add(W1,W2)'
-        const binaryMatch = opText.match(/^(add|subtract|union)\((.*)\)$/);
+        const binaryMatch = opText.match(/^(add|subtract|overlap)\((.*)\)$/);
         const unaryOps = new Set(['invert', 'reflect_horizontal', 'reflect_vertical', 'reflect_diag']);
         const isUnary = item.opFn && unaryOps.has(item.opFn);
         if (binaryMatch) {
@@ -1451,7 +1474,7 @@ function updateAllButtonStates() {
     
     // === BINARY BUTTONS ===
     // Always enabled - user can decide to do binary operations at any time
-    const bins = ['add','subtract','union'];
+    const bins = ['add','subtract','overlap'];
     bins.forEach(name => {
         const btn = document.getElementById('bin-' + name);
         if (!btn) return;
@@ -1888,9 +1911,9 @@ function updateInlinePreviewPanel() {
                 label: 'SUBTRACT',
                 hint: 'SUBTRACT – choose a base pattern, then remove the second.'
             },
-            union: {
-                label: 'UNION',
-                hint: 'UNION – keep only the overlapping cells from both patterns.'
+            overlap: {
+                label: 'OVERLAP',
+                hint: 'OVERLAP – keep only the overlapping cells from both patterns.'
             }
         };
         const opConfig = opMessages[pendingBinaryOp] || opMessages.add;
@@ -2059,7 +2082,11 @@ function resetWorkspace() {
     updateInlinePreviewPanel();
 }
 
-// ============ PREVIOUS TRIAL VIEWING SYSTEM ============
+// ============ VIEW PREVIOUS FEATURE REMOVED ============
+// View previous trial feature removed in cumulative history version
+// All history is now preserved in step sequence
+
+/*
 // View previous trial to add helpers retrospectively
 function viewPreviousTrial() {
     if (!appState.previousTrialHistory) {
@@ -2201,6 +2228,8 @@ function enableEditingButtons() {
     // Let the system recalculate button states based on current state
     updateAllButtonStates();
 }
+*/
+// End of removed View Previous functions
 
 function submitAnswer() {
     if (!currentPattern) {
@@ -2270,21 +2299,12 @@ function submitAnswer() {
         setTimeout(() => {
             modal.classList.remove('show');
             if (currentTestIndex < getTotalTrials() - 1) {
-                // Save current trial history before moving to next trial
-                appState.previousTrialHistory = {
-                    operationsHistory: JSON.parse(JSON.stringify(operationsHistory)),
-                    pattern: JSON.parse(JSON.stringify(currentPattern)),
-                    targetPattern: JSON.parse(JSON.stringify(targetPattern)),
-                    trialNumber: currentTestIndex + 1,
-                    timestamp: Date.now()
-                };
-                
+                // Move to next trial WITHOUT clearing operationsHistory
+                // (cumulative history version - keep all steps)
                 const nextIndex = currentTestIndex + 1;
-                resetWorkspace();
+                // DO NOT call resetWorkspace() - it clears operationsHistory
+                // resetWorkspace(); // REMOVED
                 loadTrial(nextIndex);
-                
-                // Show the "View Previous" button after first trial
-                updatePreviousTrialButton();
             } else {
                 showCompletionModal();
             }
@@ -2293,9 +2313,11 @@ function submitAnswer() {
 }
 
 function initializeApp() {
-    // Clear helpers at the start of real task (don't carry over from tutorial)
+    // Always start with empty favorites (either cleared from phase switch or fresh start)
+    // Tutorial helpers should not carry over to real task
     favorites = [];
     localStorage.removeItem('patternHelpers');
+    
     saveFavoritesToStorage();
     
     initializePrimitiveIcons();
@@ -2355,11 +2377,24 @@ function registerKeyboardShortcuts() {
 
 // Run on initial load: initialize and auto-start
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if we need to clear history when switching phases
+    if (localStorage.getItem('clearHistoryOnLoad') === 'true') {
+        operationsHistory = [];
+        localStorage.removeItem('clearHistoryOnLoad');
+        console.log('Cleared operationsHistory when switching from freeplay to task phase');
+    }
+    
+    // Check if we need to clear favorites when switching phases
+    if (localStorage.getItem('clearFavoritesOnLoad') === 'true') {
+        localStorage.removeItem('favorites');
+        localStorage.removeItem('patternHelpers');  // Clear the actual key used
+        favorites = [];  // Set to empty array
+        localStorage.removeItem('clearFavoritesOnLoad');
+        console.log('Cleared favorites/helpers when switching from freeplay to task phase');
+    }
+    
     initializeApp();
     startExperiment();
-    
-    // Initialize previous trial button
-    updatePreviousTrialButton();
 });
 
 Object.assign(globalScope, {

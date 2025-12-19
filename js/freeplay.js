@@ -23,10 +23,8 @@ let favorites = [];
 let inlinePreview;
 let unaryPreviewState;
 
-// Trial history management
-let previousTrialHistory = null; // Store the last trial's history
-let currentTrialHistory = null; // Store current trial being worked on
-let isViewingPreviousTrial = false; // Flag to track if user is viewing previous trial
+// Trial history management removed (cumulative history version)
+// previousTrialHistory, currentTrialHistory, isViewingPreviousTrial removed
 
 // Session recording for research analysis
 let sessionRecord = null;
@@ -277,16 +275,10 @@ function showNamingDialog() {
         
         document.body.removeChild(overlay);
         
-        // Save current trial history before clearing (allow retrospective helper addition)
-        previousTrialHistory = {
-            operationsHistory: JSON.parse(JSON.stringify(operationsHistory)),
-            pattern: JSON.parse(JSON.stringify(currentPattern)),
-            timestamp: Date.now()
-        };
-        
-        // Clear workspace after saving (like starting a new trial)
+        // DO NOT clear workspace or step sequence - keep cumulative history
+        // Reset to blank pattern but keep all operation history
         currentPattern = geomDSL.blank();
-        operationsHistory = [];
+        // operationsHistory = []; // REMOVED - keep history cumulative
         workflowSelections = [];
         pendingBinaryOp = null;
         pendingUnaryOp = null;
@@ -300,9 +292,6 @@ function showNamingDialog() {
         updateAllButtonStates();
         updateInlinePreviewPanel();
         setWorkspaceGlow(false);
-        
-        // Show the "View Previous" button if we have a previous trial
-        updatePreviousTrialButton();
     };
     
     const closeDialog = () => {
@@ -682,7 +671,11 @@ function clearWorkspace() {
     showToast('Workspace cleared. Start creating!', 'info');
 }
 
-// ============ PREVIOUS TRIAL VIEWING SYSTEM ============
+// ============ VIEW PREVIOUS FEATURE REMOVED ============
+// View previous trial feature removed in cumulative history version
+// All history is now preserved in step sequence
+
+/*
 // View previous trial to add helpers retrospectively
 function viewPreviousTrial() {
     if (!previousTrialHistory) {
@@ -818,6 +811,8 @@ function enableEditingButtons() {
     // Let the system recalculate button states based on current state
     updateAllButtonStates();
 }
+*/
+// End of removed View Previous functions
 
 // ============ FAVORITES SYSTEM ============
 // Load favorites from localStorage
@@ -1082,7 +1077,7 @@ function useFavoritePattern(id, pattern) {
         showToast('Filled unary input from Helpers', 'info', 1600);
         renderFavoritesShelf();
     } else {
-        showToast('⚠️ Please select an operation (binary or unary) before using a helper.', 'warning');
+        showToast('⚠️ Please select an operation first before using a helper.', 'warning');
     }
 }
 
@@ -1216,7 +1211,7 @@ function applyPrimitive(name) {
     });
     
     if (!pendingBinaryOp && !pendingUnaryOp) {
-        showToast('⚠️ Please select an operation (binary or unary) before choosing a primitive.', 'warning');
+        showToast('⚠️ Please select an operation first before choosing a primitive.', 'warning');
         return;
     }
     
@@ -1384,7 +1379,7 @@ function renderWorkflow() {
         const opText = item.operation || '';
         entry.onclick = () => onWorkflowClick(idx);
         
-        const binaryMatch = opText.match(/^(add|subtract|union)\((.*)\)$/);
+        const binaryMatch = opText.match(/^(add|subtract|overlap)\((.*)\)$/);
         const unaryOps = new Set(['invert', 'reflect_horizontal', 'reflect_vertical', 'reflect_diag']);
         const isUnary = item.opFn && unaryOps.has(item.opFn);
         
@@ -1936,7 +1931,7 @@ function updateInlinePreviewPanel() {
         const opMessages = {
             add: { hint: 'ADD – combine two patterns and keep all filled cells.' },
             subtract: { hint: 'SUBTRACT – choose a base pattern, then remove the second.' },
-            union: { hint: 'UNION – keep only the overlapping cells from both patterns.' }
+            overlap: { hint: 'OVERLAP – keep only the overlapping cells from both patterns.' }
         };
         const opConfig = opMessages[pendingBinaryOp] || opMessages.add;
         title.textContent = opConfig.hint;
@@ -2046,7 +2041,7 @@ function updateAllButtonStates() {
     });
     
     // Binary buttons
-    const bins = ['add','subtract','union'];
+    const bins = ['add','subtract','overlap'];
     bins.forEach(name => {
         const btn = document.getElementById('bin-' + name);
         if (!btn) return;
@@ -2087,7 +2082,7 @@ function initializeApp() {
     // Clear gallery at the start of each free play session
     localStorage.removeItem('patternGallery');
     
-    // Load favorites from localStorage
+    // Load favorites from localStorage (may already be cleared by DOMContentLoaded)
     favorites = loadFavoritesFromStorage();
     
     // Initialize session recording for research
@@ -2142,9 +2137,47 @@ function bindButtonInteractions() {
     
     // Start 10-minute auto-end timer (hidden from user)
     const FREEPLAY_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
+    const startTime = Date.now();
+    
     console.log('Starting 10-minute freeplay timer...');
+    console.log('Start time:', new Date(startTime).toLocaleTimeString());
+    console.log('End time:', new Date(startTime + FREEPLAY_DURATION).toLocaleTimeString());
+    
+    // Log remaining time every minute for development/testing
+    const logInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const remaining = FREEPLAY_DURATION - elapsed;
+        const minutesLeft = Math.floor(remaining / 60000);
+        const secondsLeft = Math.floor((remaining % 60000) / 1000);
+        
+        if (remaining > 0) {
+            console.log(`⏱️ Time remaining: ${minutesLeft}m ${secondsLeft}s`);
+        } else {
+            clearInterval(logInterval);
+        }
+    }, 60000); // Log every minute
+    
+    // Also expose a function to check time in console
+    window.checkFreeplayTime = () => {
+        const elapsed = Date.now() - startTime;
+        const remaining = FREEPLAY_DURATION - elapsed;
+        const minutesLeft = Math.floor(remaining / 60000);
+        const secondsLeft = Math.floor((remaining % 60000) / 1000);
+        console.log(`⏱️ Elapsed: ${Math.floor(elapsed / 60000)}m ${Math.floor((elapsed % 60000) / 1000)}s`);
+        console.log(`⏱️ Remaining: ${minutesLeft}m ${secondsLeft}s`);
+        return { elapsed, remaining, minutesLeft, secondsLeft };
+    };
+    
+    // Expose function to manually end freeplay (for testing)
+    window.endFreeplayNow = () => {
+        clearInterval(logInterval);
+        console.log('🛑 Manually ending freeplay mode (testing)');
+        endFreePlayMode();
+    };
+    
     setTimeout(() => {
-        console.log('10 minutes elapsed - auto-ending freeplay mode');
+        clearInterval(logInterval);
+        console.log('⏰ 10 minutes elapsed - auto-ending freeplay mode');
         endFreePlayMode();
     }, FREEPLAY_DURATION);
 }
@@ -2166,10 +2199,23 @@ function registerKeyboardShortcuts() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    initializeApp();
+    // Check if we need to clear history when switching phases
+    if (localStorage.getItem('clearHistoryOnLoad') === 'true') {
+        operationsHistory = [];
+        localStorage.removeItem('clearHistoryOnLoad');
+        console.log('Cleared operationsHistory when switching from task to freeplay phase');
+    }
     
-    // Initialize previous trial button
-    updatePreviousTrialButton();
+    // Check if we need to clear favorites when switching phases
+    if (localStorage.getItem('clearFavoritesOnLoad') === 'true') {
+        localStorage.removeItem('favorites');
+        localStorage.removeItem('patternHelpers');  // Clear the actual key used
+        favorites = [];  // Set to empty array
+        localStorage.removeItem('clearFavoritesOnLoad');
+        console.log('Cleared favorites/helpers when switching from task to freeplay phase');
+    }
+    
+    initializeApp();
 });
 
 // Export all session data for research
@@ -2393,6 +2439,11 @@ function downloadCombinedData() {
             completionTime: new Date().toISOString()
         };
         localStorage.setItem('freeplayExperimentData', JSON.stringify(sessionData));
+        
+        // Clear operationsHistory and favorites before switching phases
+        // This ensures a clean start for the task phase
+        localStorage.setItem('clearHistoryOnLoad', 'true');
+        localStorage.setItem('clearFavoritesOnLoad', 'true');
         
         // Redirect to task phase
         showToast('Moving to puzzle-solving phase...', 'info', 2000);

@@ -63,11 +63,9 @@ const appState = {
     testOrder: [],
     shouldRandomize: false,
     currentTrialRecord: null,
-    experimentCondition: getExperimentCondition(),
-    // Trial history for viewing previous trial
-    previousTrialHistory: null,
-    currentTrialHistory: null,
-    isViewingPreviousTrial: false
+    experimentCondition: getExperimentCondition()
+    // Removed: previousTrialHistory, currentTrialHistory, isViewingPreviousTrial
+    // (View Previous feature removed in cumulative history version)
 };
 
 const globalScope = typeof window !== 'undefined' ? window : globalThis;

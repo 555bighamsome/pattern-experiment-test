@@ -765,19 +765,20 @@ body:has(#experimentContent) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0;
-    border: 1px solid #d97706;
-    background: #fff7ed;
-    color: #9a3412;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #d97706;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition: all 0.15s ease;
 }
 
 .operation-thumb .favorite-add-btn:hover {
-    background: #fde68a;
-    border-color: #b45309;
+    background: #fff7ed;
+    color: #b45309;
+    transform: translateY(-50%) scale(1.2);
 }
 
 .operation-thumb .favorite-badge {
