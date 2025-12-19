@@ -24,6 +24,12 @@ const retryBtn = document.getElementById("retry-btn");
 checkBtn.onclick = () => checkComprehension();
 // Redirect based on condition
 passBtn.onclick = () => {
+    // Clear all tutorial helpers before entering main experiment
+    localStorage.removeItem('patternHelpers_tutorial');
+    localStorage.removeItem('patternHelpers');
+    localStorage.removeItem('favorites');
+    console.log('Cleared all tutorial helpers before main experiment');
+    
     if (condition === 'freeplayFirst') {
         location.href = "freeplay.html";
     } else {
