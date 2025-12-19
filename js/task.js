@@ -2283,7 +2283,7 @@ function submitAnswer() {
                 };
                 
                 const nextIndex = currentTestIndex + 1;
-                resetWorkspace();
+                // loadTrial already calls resetWorkspace(), so no need to call it here
                 loadTrial(nextIndex);
                 
                 // Show the "View Previous" button after first trial
