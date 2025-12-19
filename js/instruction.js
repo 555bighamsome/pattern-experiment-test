@@ -22,7 +22,7 @@ function setDynamicContent() {
                 <p>After getting familiarized with the interface, you will:</p>
                 <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
                     <li style="margin-bottom: 0.5rem;">
-                        <strong>Free Play Mode:</strong> Create patterns however you like—no targets, just experiment freely with shapes and operations. Save your creations to a personal gallery.
+                        <strong>Free Play Mode (10 minutes):</strong> Create patterns however you like—no targets, just experiment freely with shapes and operations. Save your creations to a personal gallery. <em style="color: #f59e0b;">You will have 10 minutes to explore and create.</em>
                     </li>
                     <li style="margin-bottom: 0.5rem;">
                         <strong>Pattern Matching:</strong> Recreate target patterns as closely as you can using the tools and techniques you've learned.
@@ -43,7 +43,7 @@ function setDynamicContent() {
                         <strong>Pattern Matching:</strong> Recreate target patterns as closely as you can using primitive shapes and operations.
                     </li>
                     <li style="margin-bottom: 0.5rem;">
-                        <strong>Free Play Mode:</strong> Create patterns however you like—no targets, just experiment freely with shapes and operations. Save your creations to a personal gallery.
+                        <strong>Free Play Mode (10 minutes):</strong> Create patterns however you like—no targets, just experiment freely with shapes and operations. Save your creations to a personal gallery. <em style="color: #f59e0b;">You will have 10 minutes to explore and create.</em>
                     </li>
                 </ol>
             `;

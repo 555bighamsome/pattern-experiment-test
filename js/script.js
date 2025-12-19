@@ -413,9 +413,10 @@ function loadTrial(index) {
     
     updateProgressUI(currentTestIndex);
 
-    if (!isTutorialMode()) {
-        seedAddPreviewWithBlankOperand();
-    }
+    // 移除默认的 add(blank, operandB) 预览
+    // if (!isTutorialMode()) {
+    //     seedAddPreviewWithBlankOperand();
+    // }
 }
 
 // Helper: update progress UI elements consistently from one place

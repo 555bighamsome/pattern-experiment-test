@@ -8,15 +8,20 @@
 </head>
 <body class="dark-page">
     <div id="experimentContent">
-        <div class="progress-bar">
+        <div class="progress-bar" style="display: flex; justify-content: space-between; align-items: center;">
             <div class="progress-info">
                 Progress: <span id="currentTrial">1</span> / <span id="totalTrials">25</span>
             </div>
             <div class="progress-track">
                 <div class="progress-fill" id="progressFill" style="width: 4%"></div>
             </div>
-            <div class="progress-info">
-                <span id="percentComplete">4%</span> Complete
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div class="progress-info">
+                    <span id="percentComplete">4%</span> Complete
+                </div>
+                <button id="previousTrialBtn" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; display: none; background: #3b82f6; color: white; border: none;">
+                    ← View Previous
+                </button>
             </div>
         </div>
 
@@ -136,7 +141,7 @@
             <div class="panel-card program-card">
                 <div class="program-header">
                     <h3>STEP SEQUENCE</h3>
-                    <button class="btn btn-success program-submit" onclick="submitAnswer()" title="Submit your answer and proceed to next pattern">
+                    <button id="submitBtn" class="btn btn-success program-submit" onclick="submitAnswer()" title="Submit your answer and proceed to next pattern">
                         <span style="font-size:1.1rem; margin-right:0.2rem;">✓</span> Submit
                     </button>
                 </div>

@@ -63,7 +63,11 @@ const appState = {
     testOrder: [],
     shouldRandomize: false,
     currentTrialRecord: null,
-    experimentCondition: getExperimentCondition()
+    experimentCondition: getExperimentCondition(),
+    // Trial history for viewing previous trial
+    previousTrialHistory: null,
+    currentTrialHistory: null,
+    isViewingPreviousTrial: false
 };
 
 const globalScope = typeof window !== 'undefined' ? window : globalThis;

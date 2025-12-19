@@ -323,26 +323,18 @@ function renderFavoritesShelf() {
             }
         });
         
-        // Delete button (visible on hover)
+        // Delete button (always visible)
         const deleteBtn = document.createElement('button');
         deleteBtn.type = 'button';
         deleteBtn.className = 'helper-delete-btn';
         deleteBtn.innerHTML = '×';
         deleteBtn.title = 'Remove from helpers';
-        deleteBtn.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:white;border:none;cursor:pointer;font-size:14px;line-height:1;padding:0;display:none;z-index:10;';
+        deleteBtn.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:white;border:none;cursor:pointer;font-size:14px;line-height:1;padding:0;z-index:10;';
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             removeFavoriteById(id);
             renderFavoritesShelf();
             renderWorkflow();
-        });
-        
-        // Show/hide delete button on hover
-        wrapper.addEventListener('mouseenter', () => {
-            deleteBtn.style.display = 'block';
-        });
-        wrapper.addEventListener('mouseleave', () => {
-            deleteBtn.style.display = 'none';
         });
         
         wrapper.appendChild(btn);
@@ -2172,17 +2164,15 @@ const tutorialSteps = [
         }
     },
     {
-        title: "Helpers - Save Favorites",
+        title: "Step 1: Add a Helper",
         content: `<p><strong>Helpers</strong> let you save patterns for quick reuse!</p>
             <ul>
                 <li>Find the <strong>+ button</strong> next to any step in "STEP SEQUENCE"</li>
                 <li>Click it to save that step as a helper</li>
                 <li>The helper appears in <strong>"YOUR HELPERS"</strong> section</li>
-                <li>Click helpers to use them as operands (just like primitives!)</li>
-                <li>You can remove helpers anytime by clicking the <strong>× button</strong> on the helper</li>
             </ul>
-            <p><strong>Try it now:</strong> Click the + button on any step below to add it to helpers.</p>
-            <p><em>This is optional but saves time when patterns repeat.</em></p>`,
+            <p><strong>Task:</strong> Click the <strong>+ button</strong> on any step to add it to helpers.</p>
+            <p><em style="color: #fbbf24;">"Next" appears after you add a helper.</em></p>`,
         onEnter: function() {
             removeTutorialHighlight();
             this._initialFavoritesCount = favorites.length;
@@ -2196,16 +2186,15 @@ const tutorialSteps = [
         }
     },
     {
-        title: "Practice: Use a Helper",
+        title: "Step 2: Use a Helper",
         content: `<p>Now let's practice using your saved helper!</p>
-            <p><strong>Task:</strong> Use a helper as an operand in an operation.</p>
+            <p><strong>Task:</strong> Use the helper you just added as an operand in an operation.</p>
             <ol>
-                <li>Add another helper first if you removed all of them</li>
                 <li>Select any operation (like <strong>add</strong> or <strong>flip_h</strong>)</li>
-                <li>Click your helper in <strong>"YOUR HELPERS"</strong> section to use it</li>
-                <li>Complete the operation and confirm</li>
+                <li>Click your helper in <strong>"YOUR HELPERS"</strong> to use it</li>
+                <li>Complete the operation and <strong>✓ Confirm</strong></li>
             </ol>
-            <p><em>Helpers work just like primitives - click them to use as operands!</em></p>`,
+            <p><em style="color: #fbbf24;">Helpers work just like primitives!</em></p>`,
         onEnter: function() {
             removeTutorialHighlight();
             this._startHistoryLength = operationsHistory.length;
@@ -2224,6 +2213,22 @@ const tutorialSteps = [
                 }
             }
             return false;
+        }
+    },
+    {
+        title: "Step 3: Delete a Helper",
+        content: `<p>You can remove helpers when you no longer need them.</p>
+            <p><strong>Task:</strong> Click the <strong>× button</strong> on any helper to delete it.</p>
+            <p><em style="color: #fbbf24;">"Next" appears after you delete a helper.</em></p>`,
+        onEnter: function() {
+            removeTutorialHighlight();
+            this._initialFavoritesCount = favorites.length;
+            highlightTutorialElement('.helpers-section');
+        },
+        waitForAction: true,
+        checkCompletion: function() {
+            // Check if user has removed at least one favorite
+            return favorites.length < (this._initialFavoritesCount || 0);
         }
     },
     {
@@ -2402,8 +2407,8 @@ function loadPracticeExercise(index) {
         basePattern: previewBackupPattern?.pattern
     });
     
-    // 初始化预览（复制task.js的逻辑）
-    seedAddPreviewWithBlankOperand();
+    // 移除默认的 add(blank, operandB) 预览
+    // seedAddPreviewWithBlankOperand();
 }
 
 // Initialize tutorial
@@ -2419,6 +2424,24 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const nextBtn = document.getElementById('tutorialNextBtn');
     if (nextBtn) nextBtn.addEventListener('click', handleTutorialNext);
+    
+    // Setup skip button for testing
+    const skipBtn = document.getElementById('tutorialSkipBtn');
+    if (skipBtn) {
+        skipBtn.addEventListener('click', () => {
+            const stepNumber = prompt(`Enter step number to skip to (1-${tutorialSteps.length}):`);
+            if (stepNumber) {
+                const step = parseInt(stepNumber) - 1;
+                if (step >= 0 && step < tutorialSteps.length) {
+                    currentTutorialStep = step;
+                    showTutorialStep(step);
+                    showToast(`Skipped to step ${step + 1}`, 'success');
+                } else {
+                    showToast(`Invalid step number. Please enter 1-${tutorialSteps.length}`, 'error');
+                }
+            }
+        });
+    }
     
     // Initialize state
     currentPattern = geomDSL.blank();

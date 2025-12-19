@@ -23,6 +23,11 @@ let favorites = [];
 let inlinePreview;
 let unaryPreviewState;
 
+// Trial history management
+let previousTrialHistory = null; // Store the last trial's history
+let currentTrialHistory = null; // Store current trial being worked on
+let isViewingPreviousTrial = false; // Flag to track if user is viewing previous trial
+
 // Session recording for research analysis
 let sessionRecord = null;
 
@@ -228,7 +233,7 @@ function showNamingDialog() {
                     box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
                 "
             >
-                Save to Gallery
+                Submit to Gallery
             </button>
         </div>
     `;
@@ -268,9 +273,36 @@ function showNamingDialog() {
         saveSessionRecord();
         
         const nameMsg = patternName ? ` "${patternName}"` : '';
-        showToast(`Saved${nameMsg} to gallery!`, 'success', 2000);
+        showToast(`Submitted${nameMsg} to gallery!`, 'success', 2000);
         
         document.body.removeChild(overlay);
+        
+        // Save current trial history before clearing (allow retrospective helper addition)
+        previousTrialHistory = {
+            operationsHistory: JSON.parse(JSON.stringify(operationsHistory)),
+            pattern: JSON.parse(JSON.stringify(currentPattern)),
+            timestamp: Date.now()
+        };
+        
+        // Clear workspace after saving (like starting a new trial)
+        currentPattern = geomDSL.blank();
+        operationsHistory = [];
+        workflowSelections = [];
+        pendingBinaryOp = null;
+        pendingUnaryOp = null;
+        previewPattern = null;
+        previewBackupPattern = null;
+        inlinePreview = createInlinePreviewState();
+        unaryPreviewState = createUnaryPreviewState();
+        
+        renderPattern(currentPattern, 'workspace');
+        renderWorkflow();
+        updateAllButtonStates();
+        updateInlinePreviewPanel();
+        setWorkspaceGlow(false);
+        
+        // Show the "View Previous" button if we have a previous trial
+        updatePreviousTrialButton();
     };
     
     const closeDialog = () => {
@@ -648,6 +680,143 @@ function clearWorkspace() {
     setWorkspaceGlow(false);
     
     showToast('Workspace cleared. Start creating!', 'info');
+}
+
+// ============ PREVIOUS TRIAL VIEWING SYSTEM ============
+// View previous trial to add helpers retrospectively
+function viewPreviousTrial() {
+    if (!previousTrialHistory) {
+        showToast('No previous trial available', 'warning');
+        return;
+    }
+    
+    // Save current trial state before switching
+    currentTrialHistory = {
+        operationsHistory: JSON.parse(JSON.stringify(operationsHistory)),
+        pattern: JSON.parse(JSON.stringify(currentPattern)),
+        workflowSelections: JSON.parse(JSON.stringify(workflowSelections)),
+        timestamp: Date.now()
+    };
+    
+    // Load previous trial
+    isViewingPreviousTrial = true;
+    operationsHistory = JSON.parse(JSON.stringify(previousTrialHistory.operationsHistory));
+    currentPattern = JSON.parse(JSON.stringify(previousTrialHistory.pattern));
+    
+    // Render the previous trial (read-only except for adding helpers)
+    renderPattern(currentPattern, 'workspace');
+    renderWorkflow();
+    updateAllButtonStates();
+    updateInlinePreviewPanel();
+    
+    // Disable editing buttons, only allow helper addition
+    disableEditingButtons();
+    
+    updatePreviousTrialButton();
+}
+
+// Return to current trial
+function returnToCurrentTrial() {
+    if (!currentTrialHistory) {
+        showToast('No current trial to return to', 'warning');
+        return;
+    }
+    
+    isViewingPreviousTrial = false;
+    
+    // Restore current trial state
+    operationsHistory = JSON.parse(JSON.stringify(currentTrialHistory.operationsHistory));
+    currentPattern = JSON.parse(JSON.stringify(currentTrialHistory.pattern));
+    workflowSelections = JSON.parse(JSON.stringify(currentTrialHistory.workflowSelections));
+    
+    // Re-render
+    renderPattern(currentPattern, 'workspace');
+    renderWorkflow();
+    updateAllButtonStates();
+    updateInlinePreviewPanel();
+    
+    // Re-enable editing
+    enableEditingButtons();
+    
+    updatePreviousTrialButton();
+}
+
+// Update the visibility and text of the previous trial button
+function updatePreviousTrialButton() {
+    const btn = document.getElementById('previousTrialBtn');
+    if (!btn) return;
+    
+    if (isViewingPreviousTrial) {
+        btn.textContent = '← Return to Current';
+        btn.onclick = returnToCurrentTrial;
+        btn.style.background = '#10b981'; // Green
+    } else if (previousTrialHistory) {
+        btn.textContent = '← View Previous';
+        btn.onclick = viewPreviousTrial;
+        btn.style.display = 'inline-block';
+        btn.style.background = '#3b82f6'; // Blue
+    } else {
+        btn.style.display = 'none';
+    }
+}
+
+// Disable editing buttons when viewing previous trial
+function disableEditingButtons() {
+    // Disable all operation buttons
+    document.querySelectorAll('.operations-section button, .primitives-section button').forEach(btn => {
+        if (!btn.classList.contains('favorite-add-btn')) {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+        }
+    });
+    
+    // Disable confirm/reset/submit buttons
+    const confirmBtn = document.getElementById('binaryConfirmBtn');
+    const resetBtn = document.getElementById('binaryResetBtn');
+    const submitBtn = document.getElementById('submitToGalleryBtn');
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = '0.5';
+    }
+    if (resetBtn) {
+        resetBtn.disabled = true;
+        resetBtn.style.opacity = '0.5';
+    }
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+    }
+}
+
+// Re-enable editing buttons when returning to current trial
+function enableEditingButtons() {
+    // Remove disabled state and clear inline opacity styles
+    document.querySelectorAll('.operations-section button, .primitives-section button').forEach(btn => {
+        btn.disabled = false;
+        btn.style.opacity = ''; // Clear inline opacity style
+        btn.style.cursor = 'pointer';
+    });
+    
+    // Re-enable confirm/reset/submit buttons and clear their opacity
+    const confirmBtn = document.getElementById('binaryConfirmBtn');
+    const resetBtn = document.getElementById('binaryResetBtn');
+    const submitBtn = document.getElementById('submitToGalleryBtn');
+    if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = ''; // Clear inline opacity
+    }
+    if (resetBtn) {
+        resetBtn.disabled = false;
+        resetBtn.style.opacity = ''; // Clear inline opacity
+    }
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = ''; // Clear inline opacity
+    }
+    
+    // Let the system recalculate button states based on current state
+    updateAllButtonStates();
 }
 
 // ============ FAVORITES SYSTEM ============
@@ -1971,21 +2140,13 @@ function bindButtonInteractions() {
         }
     });
     
-    // Bind End Free Play button
-    const endBtn = document.getElementById('endFreePlayBtn');
-    console.log('Looking for End Free Play button:', endBtn);
-    if (endBtn) {
-        console.log('End Free Play button found, adding event listener');
-        endBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log('End Free Play button clicked!');
-            endFreePlayMode();
-        });
-        // Also test if button is clickable
-        console.log('Button style:', window.getComputedStyle(endBtn).display);
-    } else {
-        console.error('End Free Play button not found in DOM');
-    }
+    // Start 10-minute auto-end timer (hidden from user)
+    const FREEPLAY_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
+    console.log('Starting 10-minute freeplay timer...');
+    setTimeout(() => {
+        console.log('10 minutes elapsed - auto-ending freeplay mode');
+        endFreePlayMode();
+    }, FREEPLAY_DURATION);
 }
 
 function handleShortcut(event) {
@@ -2006,6 +2167,9 @@ function registerKeyboardShortcuts() {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
+    
+    // Initialize previous trial button
+    updatePreviousTrialButton();
 });
 
 // Export all session data for research

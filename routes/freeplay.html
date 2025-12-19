@@ -100,12 +100,13 @@
                 Free Play Mode - Create and Save Your Patterns
             </div>
             <div style="display: flex; gap: 0.5rem;">
-                <button class="btn btn-secondary" onclick="viewGallery()" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                <button id="previousTrialBtn" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; display: none; background: #3b82f6; color: white; border: none;">
+                    ← View Previous
+                </button>
+                <button class="btn" onclick="viewGallery()" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #8b5cf6; color: white; border: none;">
                     View Gallery
                 </button>
-                <button id="endFreePlayBtn" class="btn" onclick="if(typeof endFreePlayMode === 'function'){endFreePlayMode()}else{alert('Function not loaded')}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #dc2626; color: white; border: none; cursor: pointer;">
-                    End Free Play
-                </button>
+                <!-- End Free Play button removed - 10 minute timer will auto-end -->
             </div>
         </div>
 
@@ -220,8 +221,8 @@
             <div class="panel-card program-card">
                 <div class="program-header">
                     <h3>STEP SEQUENCE</h3>
-                    <button class="btn btn-primary program-submit" onclick="saveToGallery()" title="Save your creation to gallery">
-                        Save to Gallery
+                    <button id="submitToGalleryBtn" class="btn btn-primary program-submit" onclick="saveToGallery()" title="Submit your creation to gallery">
+                        Submit to Gallery
                     </button>
                 </div>
                 <div class="operations-log" id="operationsLog">

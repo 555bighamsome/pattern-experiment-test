@@ -517,26 +517,18 @@ function renderFavoritesShelf() {
             }
         });
         
-        // Delete button (visible on hover)
+        // Delete button (always visible)
         const deleteBtn = document.createElement('button');
         deleteBtn.type = 'button';
         deleteBtn.className = 'helper-delete-btn';
         deleteBtn.innerHTML = '×';
         deleteBtn.title = 'Remove from helpers';
-        deleteBtn.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:white;border:none;cursor:pointer;font-size:14px;line-height:1;padding:0;display:none;z-index:10;';
+        deleteBtn.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:white;border:none;cursor:pointer;font-size:14px;line-height:1;padding:0;z-index:10;';
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             removeFavoriteById(id);
             renderFavoritesShelf();
             renderWorkflow();
-        });
-        
-        // Show/hide delete button on hover
-        wrapper.addEventListener('mouseenter', () => {
-            deleteBtn.style.display = 'block';
-        });
-        wrapper.addEventListener('mouseleave', () => {
-            deleteBtn.style.display = 'none';
         });
         
         wrapper.appendChild(btn);
@@ -2067,6 +2059,149 @@ function resetWorkspace() {
     updateInlinePreviewPanel();
 }
 
+// ============ PREVIOUS TRIAL VIEWING SYSTEM ============
+// View previous trial to add helpers retrospectively
+function viewPreviousTrial() {
+    if (!appState.previousTrialHistory) {
+        showToast('No previous trial available', 'warning');
+        return;
+    }
+    
+    // Save current trial state before switching
+    appState.currentTrialHistory = {
+        operationsHistory: JSON.parse(JSON.stringify(operationsHistory)),
+        pattern: JSON.parse(JSON.stringify(currentPattern)),
+        targetPattern: JSON.parse(JSON.stringify(targetPattern)),
+        workflowSelections: JSON.parse(JSON.stringify(workflowSelections)),
+        timestamp: Date.now()
+    };
+    
+    // Load previous trial
+    appState.isViewingPreviousTrial = true;
+    operationsHistory = JSON.parse(JSON.stringify(appState.previousTrialHistory.operationsHistory));
+    currentPattern = JSON.parse(JSON.stringify(appState.previousTrialHistory.pattern));
+    targetPattern = JSON.parse(JSON.stringify(appState.previousTrialHistory.targetPattern));
+    
+    // Render the previous trial (read-only except for adding helpers)
+    renderPattern(currentPattern, 'workspace');
+    renderPattern(targetPattern, 'targetPattern');
+    renderWorkflow();
+    updateAllButtonStates();
+    updateInlinePreviewPanel();
+    
+    // Disable editing buttons, only allow helper addition
+    disableEditingButtons();
+    
+    updatePreviousTrialButton();
+}
+
+// Return to current trial
+function returnToCurrentTrial() {
+    if (!appState.currentTrialHistory) {
+        showToast('No current trial to return to', 'warning');
+        return;
+    }
+    
+    appState.isViewingPreviousTrial = false;
+    
+    // Restore current trial state
+    operationsHistory = JSON.parse(JSON.stringify(appState.currentTrialHistory.operationsHistory));
+    currentPattern = JSON.parse(JSON.stringify(appState.currentTrialHistory.pattern));
+    targetPattern = JSON.parse(JSON.stringify(appState.currentTrialHistory.targetPattern));
+    workflowSelections = JSON.parse(JSON.stringify(appState.currentTrialHistory.workflowSelections));
+    
+    // Re-render
+    renderPattern(currentPattern, 'workspace');
+    renderPattern(targetPattern, 'targetPattern');
+    renderWorkflow();
+    updateAllButtonStates();
+    updateInlinePreviewPanel();
+    
+    // Re-enable editing
+    enableEditingButtons();
+    
+    updatePreviousTrialButton();
+}
+
+// Update the visibility and text of the previous trial button
+function updatePreviousTrialButton() {
+    const btn = document.getElementById('previousTrialBtn');
+    if (!btn) return;
+    
+    if (appState.isViewingPreviousTrial) {
+        btn.textContent = '← Return to Current';
+        btn.onclick = returnToCurrentTrial;
+        btn.style.display = 'inline-block';
+        btn.style.background = '#10b981'; // Green
+    } else if (appState.previousTrialHistory) {
+        btn.textContent = '← View Previous';
+        btn.onclick = viewPreviousTrial;
+        btn.style.display = 'inline-block';
+        btn.style.background = '#3b82f6'; // Blue
+    } else {
+        btn.style.display = 'none';
+    }
+}
+
+// Disable editing buttons when viewing previous trial
+function disableEditingButtons() {
+    // Disable all operation buttons
+    document.querySelectorAll('.operations-section button, .primitives-section button').forEach(btn => {
+        if (!btn.classList.contains('favorite-add-btn')) {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+        }
+    });
+    
+    // Disable confirm/reset/submit buttons
+    const confirmBtn = document.getElementById('binaryConfirmBtn');
+    const resetBtn = document.getElementById('binaryResetBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = '0.5';
+    }
+    if (resetBtn) {
+        resetBtn.disabled = true;
+        resetBtn.style.opacity = '0.5';
+    }
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+    }
+}
+
+// Re-enable editing buttons when returning to current trial
+function enableEditingButtons() {
+    // Remove disabled state and clear inline opacity styles
+    document.querySelectorAll('.operations-section button, .primitives-section button').forEach(btn => {
+        btn.disabled = false;
+        btn.style.opacity = ''; // Clear inline opacity style
+        btn.style.cursor = 'pointer';
+    });
+    
+    // Re-enable confirm/reset/submit buttons and clear their opacity
+    const confirmBtn = document.getElementById('binaryConfirmBtn');
+    const resetBtn = document.getElementById('binaryResetBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = ''; // Clear inline opacity
+    }
+    if (resetBtn) {
+        resetBtn.disabled = false;
+        resetBtn.style.opacity = ''; // Clear inline opacity
+    }
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = ''; // Clear inline opacity
+    }
+    
+    // Let the system recalculate button states based on current state
+    updateAllButtonStates();
+}
+
 function submitAnswer() {
     if (!currentPattern) {
         showToast('Please create a pattern first', 'warning');
@@ -2135,9 +2270,21 @@ function submitAnswer() {
         setTimeout(() => {
             modal.classList.remove('show');
             if (currentTestIndex < getTotalTrials() - 1) {
+                // Save current trial history before moving to next trial
+                appState.previousTrialHistory = {
+                    operationsHistory: JSON.parse(JSON.stringify(operationsHistory)),
+                    pattern: JSON.parse(JSON.stringify(currentPattern)),
+                    targetPattern: JSON.parse(JSON.stringify(targetPattern)),
+                    trialNumber: currentTestIndex + 1,
+                    timestamp: Date.now()
+                };
+                
                 const nextIndex = currentTestIndex + 1;
                 resetWorkspace();
                 loadTrial(nextIndex);
+                
+                // Show the "View Previous" button after first trial
+                updatePreviousTrialButton();
             } else {
                 showCompletionModal();
             }
@@ -2210,6 +2357,9 @@ function registerKeyboardShortcuts() {
 document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
     startExperiment();
+    
+    // Initialize previous trial button
+    updatePreviousTrialButton();
 });
 
 Object.assign(globalScope, {

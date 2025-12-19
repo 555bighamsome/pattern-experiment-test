@@ -85,22 +85,28 @@
 body {
     font-family: var(--font-sans);
     min-height: 100vh;
-    overflow: hidden; /* 防止出现滚动条 */
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+/* 只对实验任务页面隐藏滚动条 */
+body:has(#experimentContent) {
+    overflow: hidden;
+}
+
 /* Magic Stones inspired page styles */
 .light-page, .dark-page {
     margin: 0;
-    padding: 0; /* 移除padding以适应固定尺寸 */
+    padding: 2rem 0; /* 添加垂直padding以便内容不会贴边 */
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh; /* 改为 min-height 允许内容超出时滚动 */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow-y: auto; /* 允许垂直滚动 */
 }
 
 .light-page {
@@ -130,6 +136,32 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* Instruction page container */
+.instruction-page {
+    width: 1000px;
+    min-width: 1000px;
+    max-width: 1000px;
+    padding: 0 2rem;
+}
+
+.instruction-page h1 {
+    margin-bottom: 1.5rem;
+}
+
+/* Welcome section outside the instruction box */
+#welcome-section {
+    width: 1000px;
+    text-align: left;
+    margin: 1.5rem 0;
+}
+
+#welcome-section h2 {
+    color: #1f2937;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
 .instruction {
     background-color: #1f2937;
     border-radius: 8px;
@@ -137,6 +169,9 @@ body {
     margin: 2em 0;
     font-size: 1.05rem;
     color: #c5c6c7;
+    width: 1000px;
+    min-width: 1000px;
+    max-width: 1000px;
 }
 
 .light-page .instruction {
@@ -228,6 +263,24 @@ body {
     cursor: not-allowed;
 }
 
+/* Consent page styles */
+#landing {
+    width: 900px;
+    min-width: 900px;
+    max-width: 900px;
+    padding: 0 2rem;
+}
+
+#landing h1 {
+    margin-bottom: 1.5rem;
+}
+
+#landing .frame {
+    width: 900px;
+    min-width: 900px;
+    max-width: 900px;
+}
+
 /* Scrollable consent info */
 #consent-info {
     height: 450px;
@@ -292,6 +345,23 @@ body {
 }
 
 /* Reminder page styles */
+#reminder {
+    width: 800px;
+    min-width: 800px;
+    max-width: 800px;
+    padding: 0 2rem;
+}
+
+#reminder h1 {
+    margin-bottom: 1.5rem;
+}
+
+#reminder .frame {
+    width: 800px;
+    min-width: 800px;
+    max-width: 800px;
+}
+
 #reminder .frame p {
     line-height: 1.8;
     margin-bottom: 1rem;
@@ -310,8 +380,22 @@ body {
 }
 
 /* Comprehension page styles */
+#comprehension {
+    width: 900px;
+    min-width: 900px;
+    max-width: 900px;
+    padding: 0 2rem;
+}
+
+#comprehension h1 {
+    margin-bottom: 1.5rem;
+}
+
 #comprehension .frame {
     padding: 2.5em 3.5em;
+    width: 900px;
+    min-width: 900px;
+    max-width: 900px;
 }
 
 #comprehension form ol {
@@ -975,12 +1059,13 @@ body:has(#experimentContent) {
     line-height: 1;
     padding: 0;
     z-index: 10;
-    opacity: 0;
+    opacity: 1; /* 改为一直显示 */
     transition: opacity 0.2s;
 }
 
 .helper-item:hover .helper-delete {
     opacity: 1;
+    transform: scale(1.1); /* 悬停时稍微放大 */
 }
 
 .helpers-section .panel-subtitle {
@@ -2008,7 +2093,8 @@ body:has(#experimentContent) {
     opacity: 0.6;
 }
 
-/* Red danger button for End Free Play */
+/* Red danger button for End Free Play - REMOVED (auto-timer replaced manual button) */
+/*
 #endFreePlayBtn {
     background: #dc2626 !important;
     color: white !important;
@@ -2026,6 +2112,7 @@ body:has(#experimentContent) {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
 }
+*/
 
 .btn-large {
     padding: 1rem 2.5rem;
