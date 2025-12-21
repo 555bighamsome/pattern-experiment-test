@@ -1,4 +1,4 @@
-.DS_Store
+db_config.php.DS_Store
 *.json
 node_modules/
 .vscode/

@@ -248,8 +248,8 @@
                         </div>
                     </div>
                     <div class="completion-actions" style="margin: 2rem 0 1.5rem 0;">
-                        <button class="btn btn-primary btn-large" onclick="downloadCombinedData()" style="width: 100%; padding: 1rem; font-size: 1rem; background: #3b82f6; border: none;">
-                            ⬇ Download Data
+                        <button class="btn btn-primary btn-large" onclick="handleFreeplayCompletion()" style="width: 100%; padding: 1rem; font-size: 1rem; background: #3b82f6; border: none;">
+                            ✓ Submit Data
                         </button>
                     </div>
                     <p id="freeplayCompletionMessage" style="color: #64748b; font-size: 0.9rem; text-align: center; margin-bottom: 1rem; line-height: 1.5;">
@@ -267,6 +267,30 @@
 
     <script src="../js/autoScale.js"></script>
     <script src="../js/dataSubmission.js"></script>
+    <script>
+        // Called from the freeplay completion modal button.
+        // Tries server submission first; if it fails, falls back to the original download behavior.
+        async function handleFreeplayCompletion() {
+            try {
+                if (typeof submitCombinedData === 'function') {
+                    const result = await submitCombinedData();
+                    if (result && result.success) {
+                        alert('Thank you! Your data has been submitted successfully.');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.error('Submission failed:', e);
+            }
+
+            // Fallback to existing download behavior
+            if (typeof downloadCombinedData === 'function') {
+                downloadCombinedData();
+            } else {
+                alert('Submission failed and download fallback is unavailable. Please contact the researcher.');
+            }
+        }
+    </script>
     <script type="module" src="../js/freeplay.js"></script>
 </body>
 </html>

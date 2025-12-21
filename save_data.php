@@ -1,8 +1,23 @@
 <?php
 // save_data.php - Backend API to save experiment data to database
+//
+// Security notes:
+// - Do NOT hard-code DB credentials in this repo.
+// - Restrict CORS origins to your deployment domains.
+//
+// Configure allowed origins (edit to match your GitHub Pages + your server domain)
+$allowed_origins = [
+    'https://555bighamsome.github.io',
+    'https://555bighamsome.github.io/',
+    'https://bococo-81.inf.ed.ac.uk',
+    'https://bococo-81.inf.ed.ac.uk/',
+];
 
-// Enable CORS for your GitHub Pages domain and local domain
-header('Access-Control-Allow-Origin: *');  // Allow all origins for testing, restrict later
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if ($origin !== '' && in_array($origin, $allowed_origins, true)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+}
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
@@ -20,11 +35,28 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Database configuration - REPLACE THESE WITH YOUR CPANEL CREDENTIALS
-$db_host = 'localhost';  // Usually 'localhost' in cPanel
-$db_name = 'bococo81_pattern_language_experiment_db';  // Your database name from cPanel
-$db_user = 'bococo81_Zach';  // Your database username
-$db_pass = 'Xkk2003208';  // Your database password
+// Database configuration
+// Preferred: create a file named `db_config.php` next to this file (NOT committed) that returns an array.
+// Fallback: environment variables DB_HOST/DB_NAME/DB_USER/DB_PASS.
+$configFile = __DIR__ . '/db_config.php';
+$dbConfig = null;
+if (is_readable($configFile)) {
+    $dbConfig = require $configFile;
+}
+
+$db_host = $dbConfig['host'] ?? getenv('DB_HOST') ?: 'localhost';
+$db_name = $dbConfig['name'] ?? getenv('DB_NAME') ?: '';
+$db_user = $dbConfig['user'] ?? getenv('DB_USER') ?: '';
+$db_pass = $dbConfig['pass'] ?? getenv('DB_PASS') ?: '';
+
+if ($db_name === '' || $db_user === '' || $db_pass === '') {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Server misconfigured: missing DB_NAME/DB_USER/DB_PASS'
+    ]);
+    exit();
+}
 
 try {
     // Connect to database
@@ -62,9 +94,9 @@ try {
 
     // Insert into database
     $sql = "INSERT INTO experiment_data 
-            (participant_id, condition, task_data, freeplay_data, user_agent, screen_resolution) 
-            VALUES 
-            (:participant_id, :condition, :task_data, :freeplay_data, :user_agent, :screen_resolution)";
+        (participant_id, `condition`, task_data, freeplay_data, user_agent, screen_resolution) 
+        VALUES 
+        (:participant_id, :condition, :task_data, :freeplay_data, :user_agent, :screen_resolution)";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute([

@@ -1,12 +1,26 @@
 <?php
 // setup_database.php - One-time script to create database table
 // ⚠️ DELETE THIS FILE after successful setup for security!
+//
+// IMPORTANT:
+// - Do NOT keep credentials in this file.
+// - Create `db_config.php` next to this file (NOT committed) OR set env vars.
 
-// Database configuration - UPDATE THESE VALUES
-$db_host = 'localhost';
-$db_name = 'bococo81_pattern_language_experiment_db';
-$db_user = 'bococo81_Zach';
-$db_pass = 'Xkk2003208';  // ⚠️ REPLACE WITH YOUR ACTUAL PASSWORD
+$configFile = __DIR__ . '/db_config.php';
+$dbConfig = null;
+if (is_readable($configFile)) {
+    $dbConfig = require $configFile;
+}
+
+$db_host = $dbConfig['host'] ?? getenv('DB_HOST') ?: 'localhost';
+$db_name = $dbConfig['name'] ?? getenv('DB_NAME') ?: '';
+$db_user = $dbConfig['user'] ?? getenv('DB_USER') ?: '';
+$db_pass = $dbConfig['pass'] ?? getenv('DB_PASS') ?: '';
+
+if ($db_name === '' || $db_user === '' || $db_pass === '') {
+    echo "<p style='color: red;'>✗ Missing DB config. Create db_config.php or set DB_NAME/DB_USER/DB_PASS env vars.</p>";
+    exit();
+}
 
 echo "<h1>Database Setup Script</h1>";
 echo "<p>Attempting to connect and create table...</p>";
