@@ -2329,14 +2329,14 @@ function endFreePlayMode() {
         }
         
         // Update button text based on condition
-        const downloadBtn = document.querySelector('#freeplayCompletionModal button[onclick="downloadCombinedData()"]');
-        if (downloadBtn) {
+        const submitBtn = document.querySelector('#freeplayCompletionModal button[onclick="handleFreeplayCompletion()"]');
+        if (submitBtn) {
             if (condition === 'freeplayFirst') {
-                downloadBtn.innerHTML = '→ Continue to Puzzle Phase';
-                downloadBtn.style.background = '#10b981'; // Green for continue
+                submitBtn.innerHTML = '→ Continue to Puzzle Phase';
+                submitBtn.style.background = '#10b981'; // Green for continue
             } else {
-                downloadBtn.innerHTML = '⬇ Download Data';
-                downloadBtn.style.background = '#3b82f6'; // Blue for download
+                submitBtn.innerHTML = '✓ Submit Data';
+                submitBtn.style.background = '#3b82f6'; // Blue for submit
             }
         }
         
@@ -2349,7 +2349,7 @@ function endFreePlayMode() {
             } else {
                 // Show the message for puzzleFirst (this is the final phase)
                 completionMsg.style.display = 'block';
-                completionMsg.textContent = 'Your complete experiment data is ready for download.';
+                completionMsg.textContent = 'Your complete experiment data will be submitted to the server.';
             }
         }
         
@@ -2362,6 +2362,7 @@ function endFreePlayMode() {
             } else {
                 // Show email instruction for puzzleFirst (this is the final phase)
                 emailInstruction.style.display = 'block';
+                emailInstruction.innerHTML = '<p style="color: #334155; font-size: 0.9rem; margin: 0; text-align: center;">If submission fails, the data will be downloaded automatically.</p>';
             }
         }
         

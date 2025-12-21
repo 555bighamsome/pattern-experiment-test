@@ -170,19 +170,14 @@
                                 <span id="finalPointsValue">0</span> / <span id="finalPointsMax">20</span>
                             </div>
                         </div>
-                        <div class="completion-actions" style="margin: 2rem 0 1.5rem 0; display: flex; flex-direction: column; gap: 0.75rem;">
-                            <button class="btn btn-primary btn-large" id="downloadTaskOnlyBtn" onclick="handleTaskCompletion()" style="width: 100%; padding: 1rem; font-size: 1rem; background: #3b82f6; border: none;">
-                                ✓ Submit & Exit
-                            </button>
-                            <button class="btn btn-primary btn-large" id="enterFreePlayBtn" onclick="enterFreePlayMode()" style="width: 100%; padding: 1rem; font-size: 1rem; background: #8b5cf6; border: none;">
-                                Continue to Free Play Mode
+                        <div class="completion-actions" style="margin: 2rem 0 1.5rem 0;">
+                            <button class="btn btn-primary btn-large" id="continueBtn" onclick="handleTaskContinue()" style="width: 100%; padding: 1rem; font-size: 1rem; background: #10b981; border: none;">
+                                → Continue
                             </button>
                         </div>
-                        <div id="taskEmailInstruction" style="background: #f1f5f9; padding: 1rem; border-radius: 8px; border-left: 4px solid #3b82f6; display:none;">
-                            <p style="color: #334155; font-size: 0.9rem; margin: 0; text-align: center;">
-                                If submission fails, a download will be offered as a backup.
-                            </p>
-                        </div>
+                        <p id="taskContinueMessage" style="color: #64748b; font-size: 0.9rem; text-align: center; margin: 0; line-height: 1.5;">
+                            Your progress has been saved.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -192,27 +187,62 @@
     <script src="../js/autoScale.js"></script>
     <script src="../js/dataSubmission.js"></script>
     <script>
-        // Called from the completion modal button.
-        // Tries server submission first; if it fails, falls back to the original download behavior.
-        async function handleTaskCompletion() {
-            try {
-                if (typeof submitCombinedData === 'function') {
-                    const result = await submitCombinedData();
-                    if (result && result.success) {
-                        alert('Thank you! Your data has been submitted successfully.');
-                        return;
+        // Unified function to handle task continuation
+        async function handleTaskContinue() {
+            // Normalize condition string
+            function normalizeCondition(condition) {
+                if (!condition) return 'puzzleFirst';
+                const normalized = condition.trim().toLowerCase();
+                if (normalized === 'puzzlefirst') return 'puzzleFirst';
+                if (normalized === 'freeplayfirst') return 'freeplayFirst';
+                return condition.trim();
+            }
+            
+            let condition = localStorage.getItem('experimentCondition') || 'puzzleFirst';
+            condition = normalizeCondition(condition);
+            
+            // Always save task data first
+            if (typeof allTrialsData !== 'undefined') {
+                localStorage.setItem('taskExperimentData', JSON.stringify(allTrialsData));
+                localStorage.setItem('taskCompletionTime', new Date().toISOString());
+            }
+            
+            // If freeplayFirst, this is the final phase - submit data
+            if (condition === 'freeplayFirst') {
+                try {
+                    if (typeof submitCombinedData === 'function') {
+                        const result = await submitCombinedData();
+                        if (result && result.success) {
+                            alert('Thank you! Your data has been submitted successfully.');
+                            return;
+                        }
                     }
+                } catch (e) {
+                    console.error('Submission failed:', e);
                 }
-            } catch (e) {
-                console.error('Submission failed:', e);
+                
+                // Fallback to download
+                if (typeof downloadExperimentData === 'function') {
+                    downloadExperimentData();
+                } else {
+                    alert('Submission failed. Please contact the researcher.');
+                }
+                return;
             }
-
-            // Fallback to existing download behavior
-            if (typeof downloadTaskDataOnly === 'function') {
-                downloadTaskDataOnly();
+            
+            // If puzzleFirst, continue to freeplay
+            if (typeof enterFreePlayMode === 'function') {
+                enterFreePlayMode();
             } else {
-                alert('Submission failed and download fallback is unavailable. Please contact the researcher.');
+                // Direct redirect as fallback
+                localStorage.setItem('clearFavoritesOnLoad', 'true');
+                window.location.href = 'freeplay.html';
             }
+        }
+
+        // Keep old function for backward compatibility
+        async function handleTaskCompletion() {
+            await handleTaskContinue();
         }
     </script>
     <script type="module" src="../js/task.js"></script>

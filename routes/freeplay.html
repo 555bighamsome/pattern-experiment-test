@@ -271,6 +271,36 @@
         // Called from the freeplay completion modal button.
         // Tries server submission first; if it fails, falls back to the original download behavior.
         async function handleFreeplayCompletion() {
+            // Normalize condition string
+            function normalizeCondition(condition) {
+                if (!condition) return 'puzzleFirst';
+                const normalized = condition.trim().toLowerCase();
+                if (normalized === 'puzzlefirst') return 'puzzleFirst';
+                if (normalized === 'freeplayfirst') return 'freeplayFirst';
+                return condition.trim();
+            }
+            
+            let condition = localStorage.getItem('experimentCondition') || 'puzzleFirst';
+            condition = normalizeCondition(condition);
+            
+            // Always save freeplay data first
+            const sessionData = {
+                sessions: JSON.parse(localStorage.getItem('freeplaySessions') || '[]'),
+                gallery: typeof getGalleryFromStorage === 'function' ? getGalleryFromStorage() : [],
+                helpers: typeof loadFavoritesFromStorage === 'function' ? loadFavoritesFromStorage() : [],
+                completionTime: new Date().toISOString()
+            };
+            localStorage.setItem('freeplayExperimentData', JSON.stringify(sessionData));
+            
+            // If freeplayFirst, redirect to task phase (don't submit yet)
+            if (condition === 'freeplayFirst') {
+                localStorage.setItem('clearFavoritesOnLoad', 'true');
+                alert('Moving to puzzle-solving phase...');
+                window.location.href = 'task.html';
+                return;
+            }
+            
+            // If puzzleFirst, submit combined data to server
             try {
                 if (typeof submitCombinedData === 'function') {
                     const result = await submitCombinedData();
