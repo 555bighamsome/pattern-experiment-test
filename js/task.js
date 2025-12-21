@@ -50,38 +50,31 @@ function showCompletionModal() {
         pointsMaxEl.textContent = String(POINTS_MAX);
     }
     
-    // Check condition to determine which buttons to show
+    // Check condition to update button text and message
     let condition = localStorage.getItem('experimentCondition') || 'puzzleFirst';
     condition = normalizeCondition(condition);
     console.log('showCompletionModal - Condition:', condition);
     
-    const downloadBtn = document.getElementById('downloadTaskOnlyBtn');
-    const freeplayBtn = document.getElementById('enterFreePlayBtn');
-    const emailInstruction = document.getElementById('taskEmailInstruction');
+    const continueBtn = document.getElementById('continueBtn');
+    const continueMessage = document.getElementById('taskContinueMessage');
     
     if (condition === 'freeplayFirst') {
-        // freeplayFirst: This is the final phase, only show download button
-        if (downloadBtn) {
-            downloadBtn.textContent = '⬇ Download All Data & Exit';
-            downloadBtn.style.display = 'block';
+        // freeplayFirst: This is the final phase - show submit button
+        if (continueBtn) {
+            continueBtn.innerHTML = '✓ Submit Data';
+            continueBtn.style.background = '#3b82f6'; // Blue for submit
         }
-        if (freeplayBtn) {
-            freeplayBtn.style.display = 'none'; // Hide free play button
-        }
-        if (emailInstruction) {
-            emailInstruction.style.display = 'block'; // Show email instruction (final phase)
+        if (continueMessage) {
+            continueMessage.textContent = 'Your complete experiment data will be submitted.';
         }
     } else {
-        // puzzleFirst: Only show continue to freeplay button, hide download button
-        if (downloadBtn) {
-            downloadBtn.style.display = 'none'; // Hide download button
+        // puzzleFirst: Continue to freeplay phase
+        if (continueBtn) {
+            continueBtn.innerHTML = '→ Continue to Free Play';
+            continueBtn.style.background = '#10b981'; // Green for continue
         }
-        if (freeplayBtn) {
-            freeplayBtn.textContent = '→ Continue to Free Play Mode';
-            freeplayBtn.style.display = 'block';
-        }
-        if (emailInstruction) {
-            emailInstruction.style.display = 'none'; // Hide email instruction (not final phase)
+        if (continueMessage) {
+            continueMessage.textContent = 'Your progress has been saved.';
         }
     }
     
