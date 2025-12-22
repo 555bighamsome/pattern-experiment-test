@@ -43,6 +43,7 @@ try {
     $sql = "CREATE TABLE IF NOT EXISTS experiment_data (
         id INT AUTO_INCREMENT PRIMARY KEY,
         participant_id VARCHAR(100),
+        prolific_id VARCHAR(64),
         `condition` VARCHAR(50),
         submission_time DATETIME DEFAULT CURRENT_TIMESTAMP,
         task_data JSON,
@@ -50,6 +51,7 @@ try {
         user_agent TEXT,
         screen_resolution VARCHAR(50),
         INDEX idx_participant (participant_id),
+        INDEX idx_prolific (prolific_id),
         INDEX idx_condition (`condition`),
         INDEX idx_time (submission_time)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";

@@ -15,6 +15,7 @@ async function submitDataToServer(data) {
         // Add metadata
         const payload = {
             participantId: data.participantId || generateParticipantId(),
+            prolificId: localStorage.getItem('prolificId') || null,
             condition: data.condition,
             taskData: data.taskData || null,
             freeplayData: data.freeplayData || null,

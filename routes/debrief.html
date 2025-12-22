@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pattern DSL Experiment - Debrief</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body class="light-page">
+  <div id="debrief" class="instruction-page">
+    <h1 style="text-align:center;">Thank you for your contribution to science</h1>
+
+    <div class="frame" style="max-width: 980px;">
+      <p style="margin: 0 0 1rem 0; font-size: 1.05rem;">
+        You will be eligible for full payment once you answer <span style="color: var(--color-danger); font-weight: 700;">all questions</span>.
+      </p>
+
+      <form id="debrief-form">
+        <div style="margin-top: 0.75rem;">
+          <label style="display:block; font-weight:600;" for="age">1. How old are you?</label>
+          <div style="display:flex; align-items:center; gap: 0.5rem; margin-top: 0.35rem;">
+            <input id="age" name="age" type="number" min="0" max="120" required style="width: 70px; padding: 0.35rem 0.45rem;" />
+            <span>years</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 0.9rem;">
+          <label style="display:block; font-weight:600;" for="gender">2. What is your gender?</label>
+          <select id="gender" name="gender" required style="width: 340px; padding: 0.35rem 0.45rem; margin-top: 0.35rem;">
+            <option value="" selected></option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="nonbinary">Non-binary</option>
+            <option value="other">Other</option>
+            <option value="prefer_not">Prefer not to say</option>
+          </select>
+        </div>
+
+        <div style="margin-top: 0.9rem;">
+          <label style="display:block; font-weight:600;" for="engagement">3. On a scale of 1-10 (where 10 is the most engaged), please rate how <strong>ENGAGING</strong> you found the task:</label>
+          <select id="engagement" name="engagement" required style="width: 140px; padding: 0.35rem 0.45rem; margin-top: 0.35rem;">
+            <option value="" selected></option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+
+        <div style="margin-top: 0.9rem;">
+          <label style="display:block; font-weight:600;" for="difficulty">4. On a scale of 1-10 (where 10 is the most difficult), please rate how <strong>DIFFICULT</strong> you found the task:</label>
+          <select id="difficulty" name="difficulty" required style="width: 140px; padding: 0.35rem 0.45rem; margin-top: 0.35rem;">
+            <option value="" selected></option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+
+        <div style="margin-top: 0.95rem;">
+          <label style="display:block; font-weight:600;" for="strategy">5. What are your strategies in playing with the machines?</label>
+          <textarea id="strategy" name="strategy" rows="4" required placeholder="Please type here" style="width:100%; box-sizing:border-box; padding: 0.75rem; margin-top: 0.35rem;"></textarea>
+        </div>
+
+        <div style="margin-top: 0.95rem;">
+          <label style="display:block; font-weight:600;" for="fusion_opinion">6. How often do fusions work out in this game, in your opinion?</label>
+          <textarea id="fusion_opinion" name="fusion_opinion" rows="4" required placeholder="Please type here" style="width:100%; box-sizing:border-box; padding: 0.75rem; margin-top: 0.35rem;"></textarea>
+        </div>
+
+        <div style="margin-top: 0.95rem;">
+          <label style="display:block; font-weight:600;" for="comments">7. Do you have any comments regarding the experiment?</label>
+          <textarea id="comments" name="comments" rows="4" required placeholder="Please type here" style="width:100%; box-sizing:border-box; padding: 0.75rem; margin-top: 0.35rem;"></textarea>
+        </div>
+      </form>
+
+      <div id="debrief-error" style="color:#ef4444; margin-top: 0.75rem; display:none;"></div>
+    </div>
+
+    <div class="button-group" style="margin-top: 0.25rem;">
+      <button class="big-button" id="debrief-submit" disabled style="opacity: 0.35;">Done</button>
+    </div>
+
+    <div id="completion" class="frame" style="max-width: 920px; margin-top: 1.25rem; display:none;">
+      <h2 style="margin-top:0;">Complete ✅</h2>
+      <p style="margin: 0.25rem 0 0;">Your completion code is:</p>
+      <div style="display:flex; align-items:center; gap: 0.75rem; margin-top: 0.75rem;">
+        <div id="completion-code" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.4rem; font-weight: 700; color:#1e40af;">CWWHERKO</div>
+        <button class="btn btn-primary" id="copy-code" type="button">Copy</button>
+      </div>
+      <p style="margin-top: 0.75rem; color:#475569;">
+        Please return to Prolific and enter this code to receive payment.
+      </p>
+    </div>
+  </div>
+
+  <script src="../js/dataSubmission.js"></script>
+  <script src="../js/debrief.js"></script>
+</body>
+</html>

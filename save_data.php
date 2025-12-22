@@ -86,27 +86,65 @@ try {
 
     // Extract data
     $participant_id = $data['participantId'];
+    $prolific_id = isset($data['prolificId']) ? $data['prolificId'] : null;
     $condition = $data['condition'];
-    $task_data = isset($data['taskData']) ? json_encode($data['taskData']) : null;
-    $freeplay_data = isset($data['freeplayData']) ? json_encode($data['freeplayData']) : null;
+
+    // If DB schema is not migrated yet (no prolific_id column), we keep compatibility by
+    // embedding prolificId into JSON blobs as an extra field.
+    $taskObj = isset($data['taskData']) ? $data['taskData'] : null;
+    $freeplayObj = isset($data['freeplayData']) ? $data['freeplayData'] : null;
+    if ($prolific_id !== null) {
+        if (is_array($taskObj)) {
+            $taskObj['prolificId'] = $prolific_id;
+        }
+        if (is_array($freeplayObj)) {
+            $freeplayObj['prolificId'] = $prolific_id;
+        }
+    }
+    $task_data = $taskObj !== null ? json_encode($taskObj) : null;
+    $freeplay_data = $freeplayObj !== null ? json_encode($freeplayObj) : null;
     $user_agent = isset($data['userAgent']) ? $data['userAgent'] : $_SERVER['HTTP_USER_AGENT'];
     $screen_resolution = isset($data['screenResolution']) ? $data['screenResolution'] : null;
 
     // Insert into database
-    $sql = "INSERT INTO experiment_data 
-        (participant_id, `condition`, task_data, freeplay_data, user_agent, screen_resolution) 
-        VALUES 
-        (:participant_id, :condition, :task_data, :freeplay_data, :user_agent, :screen_resolution)";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':participant_id' => $participant_id,
-        ':condition' => $condition,
-        ':task_data' => $task_data,
-        ':freeplay_data' => $freeplay_data,
-        ':user_agent' => $user_agent,
-        ':screen_resolution' => $screen_resolution
-    ]);
+    // Try with prolific_id column first; if that column does not exist, fall back.
+    try {
+        $sql = "INSERT INTO experiment_data 
+            (participant_id, prolific_id, `condition`, task_data, freeplay_data, user_agent, screen_resolution) 
+            VALUES 
+            (:participant_id, :prolific_id, :condition, :task_data, :freeplay_data, :user_agent, :screen_resolution)";
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':participant_id' => $participant_id,
+            ':prolific_id' => $prolific_id,
+            ':condition' => $condition,
+            ':task_data' => $task_data,
+            ':freeplay_data' => $freeplay_data,
+            ':user_agent' => $user_agent,
+            ':screen_resolution' => $screen_resolution
+        ]);
+    } catch (PDOException $e) {
+        // Unknown column 'prolific_id' => fallback insert without it.
+        if (strpos($e->getMessage(), 'prolific_id') === false) {
+            throw $e;
+        }
+
+        $sql = "INSERT INTO experiment_data 
+            (participant_id, `condition`, task_data, freeplay_data, user_agent, screen_resolution) 
+            VALUES 
+            (:participant_id, :condition, :task_data, :freeplay_data, :user_agent, :screen_resolution)";
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':participant_id' => $participant_id,
+            ':condition' => $condition,
+            ':task_data' => $task_data,
+            ':freeplay_data' => $freeplay_data,
+            ':user_agent' => $user_agent,
+            ':screen_resolution' => $screen_resolution
+        ]);
+    }
 
     $insert_id = $pdo->lastInsertId();
 

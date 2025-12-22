@@ -213,7 +213,7 @@
                     if (typeof submitCombinedData === 'function') {
                         const result = await submitCombinedData();
                         if (result && result.success) {
-                            alert('Thank you! Your data has been submitted successfully.');
+                            window.location.href = 'debrief.html';
                             return;
                         }
                     }
