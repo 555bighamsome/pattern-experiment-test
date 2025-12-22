@@ -2353,18 +2353,7 @@ function endFreePlayMode() {
             }
         }
         
-        // Update email instruction based on condition
-        const emailInstruction = document.getElementById('freeplayEmailInstruction');
-        if (emailInstruction) {
-            if (condition === 'freeplayFirst') {
-                // Hide email instruction for freeplayFirst (not the final phase)
-                emailInstruction.style.display = 'none';
-            } else {
-                // Show email instruction for puzzleFirst (this is the final phase)
-                emailInstruction.style.display = 'block';
-                emailInstruction.innerHTML = '<p style="color: #334155; font-size: 0.9rem; margin: 0; text-align: center;">If submission fails, the data will be downloaded automatically.</p>';
-            }
-        }
+        // Formal experiment: no email/download fallback UI.
         
         // Show modal
         const modal = document.getElementById('freeplayCompletionModal');

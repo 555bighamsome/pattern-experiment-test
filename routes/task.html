@@ -220,13 +220,8 @@
                 } catch (e) {
                     console.error('Submission failed:', e);
                 }
-                
-                // Fallback to download
-                if (typeof downloadExperimentData === 'function') {
-                    downloadExperimentData();
-                } else {
-                    alert('Submission failed. Please contact the researcher.');
-                }
+
+                alert('We could not submit your data automatically. Please refresh the page and try again. If the issue persists, please contact the researcher.');
                 return;
             }
             
