@@ -140,7 +140,14 @@ submitBtn.addEventListener('click', async () => {
 
     const submitted = await ensureSubmitted();
     if (!submitted.ok) {
-      setError('Could not submit your data automatically. Please contact the researcher.');
+      // Allow retry: re-enable the button and keep the participant on this page.
+      setError(
+        'We could not submit your data automatically. Please check your internet connection and try again. '
+        + 'If the issue persists, please contact the researcher.'
+      );
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Done';
+      updateUi();
       return;
     }
 
@@ -148,10 +155,19 @@ submitBtn.addEventListener('click', async () => {
     submitBtn.textContent = 'Submitted ✓';
   } catch (e) {
     console.error(e);
-    setError('Something went wrong. Please contact the researcher.');
+    setError(
+      'Something went wrong while submitting. Please try again. '
+      + 'If the issue persists, please contact the researcher.'
+    );
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Done';
+    updateUi();
   } finally {
-    // Keep it disabled after submit (avoid duplicate submissions)
-    submitBtn.disabled = true;
+    // If we successfully submitted, keep disabled (avoid duplicates).
+    // If not, we already re-enabled above.
+    if (localStorage.getItem('serverSubmissionSuccess') === 'true') {
+      submitBtn.disabled = true;
+    }
   }
 });
 

@@ -264,7 +264,7 @@
     <script src="../js/dataSubmission.js"></script>
     <script>
     // Called from the freeplay completion modal button.
-    // Formal experiment: server submission only (no email/download fallback).
+    // Formal experiment: do NOT submit here. Submission happens on debrief page.
         async function handleFreeplayCompletion() {
             // Normalize condition string
             function normalizeCondition(condition) {
@@ -295,20 +295,8 @@
                 return;
             }
             
-            // If puzzleFirst, submit combined data to server
-            try {
-                if (typeof submitCombinedData === 'function') {
-                    const result = await submitCombinedData();
-                    if (result && result.success) {
-                        window.location.href = 'debrief.html';
-                        return;
-                    }
-                }
-            } catch (e) {
-                console.error('Submission failed:', e);
-            }
-
-            alert('We could not submit your data automatically. Please refresh the page and try again. If the issue persists, please contact the researcher.');
+            // puzzleFirst: freeplay is the final phase, proceed to debrief.
+            window.location.href = 'debrief.html';
         }
     </script>
     <script type="module" src="../js/freeplay.js"></script>

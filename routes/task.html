@@ -209,19 +209,9 @@
             
             // If freeplayFirst, this is the final phase - submit data
             if (condition === 'freeplayFirst') {
-                try {
-                    if (typeof submitCombinedData === 'function') {
-                        const result = await submitCombinedData();
-                        if (result && result.success) {
-                            window.location.href = 'debrief.html';
-                            return;
-                        }
-                    }
-                } catch (e) {
-                    console.error('Submission failed:', e);
-                }
-
-                alert('We could not submit your data automatically. Please refresh the page and try again. If the issue persists, please contact the researcher.');
+                // Formal experiment: do NOT submit here.
+                // Just proceed to debrief; submission happens when participant clicks Done on debrief page.
+                window.location.href = 'debrief.html';
                 return;
             }
             
