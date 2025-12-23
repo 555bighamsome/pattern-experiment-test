@@ -31,6 +31,9 @@ let isViewingPreviousTrial = false; // Flag to track if user is viewing previous
 // Session recording for research analysis
 let sessionRecord = null;
 
+// Early finish rule: once participants have saved enough creations, allow them to end early
+const FREEPLAY_EARLY_FINISH_MIN_CREATIONS = 5;
+
 // Initialize state objects
 function createInlinePreviewState() {
     return {
@@ -123,6 +126,45 @@ function saveSessionRecord() {
     localStorage.setItem('freeplaySessions', JSON.stringify(allSessions));
 }
 
+function updateEarlyFinishUI() {
+    const btn = document.getElementById('finishFreePlayBtn');
+    const hint = document.getElementById('freeplayEarlyFinishHint');
+    if (!btn || !hint) return;
+
+    const gallery = getGalleryFromStorage();
+    const eligible = Array.isArray(gallery) && gallery.length >= FREEPLAY_EARLY_FINISH_MIN_CREATIONS;
+
+    // Keep it low-key: only show once eligible.
+    if (eligible) {
+        btn.style.display = 'inline-block';
+        hint.style.display = 'inline-block';
+    } else {
+        btn.style.display = 'none';
+        hint.style.display = 'none';
+    }
+}
+
+function finishFreePlayEarly() {
+    // Guard: only allow once eligible
+    const gallery = getGalleryFromStorage();
+    if (!Array.isArray(gallery) || gallery.length < FREEPLAY_EARLY_FINISH_MIN_CREATIONS) {
+        return;
+    }
+
+    // Record reason for analysis
+    if (sessionRecord) {
+        sessionRecord.endedEarly = true;
+        sessionRecord.endedEarlyReason = 'minCreationsReached';
+        sessionRecord.endedEarlyAt = Date.now();
+        sessionRecord.galleryCountAtEarlyEnd = gallery.length;
+    }
+
+    endFreePlayMode();
+}
+
+// Expose for inline onclick handler in HTML
+window.finishFreePlayEarly = finishFreePlayEarly;
+
 // ============ GALLERY FUNCTIONS ============
 function getGalleryFromStorage() {
     const stored = localStorage.getItem('patternGallery');
@@ -139,6 +181,8 @@ function updateGalleryCount() {
         const gallery = getGalleryFromStorage();
         el.textContent = String(gallery.length);
     }
+
+    updateEarlyFinishUI();
 }
 
 function saveToGallery() {
@@ -2176,6 +2220,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     initializeApp();
+
+    // Sync early-finish UI on load (in case gallery already has items)
+    updateGalleryCount();
     
     // Initialize previous trial button
     updatePreviousTrialButton();

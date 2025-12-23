@@ -103,7 +103,18 @@
                 <button class="btn" onclick="viewGallery()" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #8b5cf6; color: white; border: none;">
                     View Gallery
                 </button>
-                <!-- End Free Play button removed - 5 minute timer will auto-end -->
+                <div id="freeplayEarlyFinishHint" style="display:none; align-self:center; font-size:0.8rem; color:#94a3b8; margin-left:0.25rem;">
+                    You may finish early when ready.
+                </div>
+                <button
+                    id="finishFreePlayBtn"
+                    class="btn"
+                    onclick="window.finishFreePlayEarly && window.finishFreePlayEarly()"
+                    style="display:none; padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #10b981; color: white; border: none;"
+                    title="Finish Free Play and continue"
+                >
+                    Finish Free Play
+                </button>
             </div>
         </div>
 
@@ -290,7 +301,6 @@
             // If freeplayFirst, redirect to task phase (don't submit yet)
             if (condition === 'freeplayFirst') {
                 localStorage.setItem('clearFavoritesOnLoad', 'true');
-                alert('Moving to puzzle-solving phase...');
                 window.location.href = 'task.html';
                 return;
             }
