@@ -61,20 +61,14 @@ function showCompletionModal() {
     if (condition === 'freeplayFirst') {
         // freeplayFirst: This is the final phase - show submit button
         if (continueBtn) {
-            continueBtn.innerHTML = '✓ Submit Data';
-            continueBtn.style.background = '#3b82f6'; // Blue for submit
-        }
-        if (continueMessage) {
-            continueMessage.textContent = 'Your complete experiment data will be submitted.';
+            continueBtn.innerHTML = '→ Continue';
+            continueBtn.style.background = '#3b82f6';
         }
     } else {
         // puzzleFirst: Continue to freeplay phase
         if (continueBtn) {
-            continueBtn.innerHTML = '→ Continue to Free Play';
-            continueBtn.style.background = '#10b981'; // Green for continue
-        }
-        if (continueMessage) {
-            continueMessage.textContent = 'Your progress has been saved.';
+            continueBtn.innerHTML = '→ Continue';
+            continueBtn.style.background = '#3b82f6';
         }
     }
     
