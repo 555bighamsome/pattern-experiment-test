@@ -128,8 +128,7 @@ function saveSessionRecord() {
 
 function updateEarlyFinishUI() {
     const btn = document.getElementById('finishFreePlayBtn');
-    const hint = document.getElementById('freeplayEarlyFinishHint');
-    if (!btn || !hint) return;
+    if (!btn) return;
 
     const gallery = getGalleryFromStorage();
     const eligible = Array.isArray(gallery) && gallery.length >= FREEPLAY_EARLY_FINISH_MIN_CREATIONS;
@@ -137,10 +136,8 @@ function updateEarlyFinishUI() {
     // Keep it low-key: only show once eligible.
     if (eligible) {
         btn.style.display = 'inline-block';
-        hint.style.display = 'inline-block';
     } else {
         btn.style.display = 'none';
-        hint.style.display = 'none';
     }
 }
 
