@@ -22,6 +22,9 @@ header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
+// Simple request id for correlating client-side Network logs with server responses
+$request_id = bin2hex(random_bytes(8));
+
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -53,7 +56,11 @@ if ($db_name === '' || $db_user === '' || $db_pass === '') {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'Server misconfigured: missing DB_NAME/DB_USER/DB_PASS'
+        'requestId' => $request_id,
+        'error' => 'Server misconfigured: missing DB_NAME/DB_USER/DB_PASS',
+        'hasDbConfigFile' => is_readable($configFile),
+        'origin' => $origin,
+        'host' => $_SERVER['HTTP_HOST'] ?? null
     ]);
     exit();
 }
@@ -151,6 +158,7 @@ try {
     // Success response
     echo json_encode([
         'success' => true,
+        'requestId' => $request_id,
         'message' => 'Data saved successfully',
         'id' => $insert_id
     ]);
@@ -160,6 +168,7 @@ try {
     http_response_code(500);
     echo json_encode([
         'success' => false,
+        'requestId' => $request_id,
         'error' => 'Database error: ' . $e->getMessage()
     ]);
 } catch (Exception $e) {
@@ -167,6 +176,7 @@ try {
     http_response_code(400);
     echo json_encode([
         'success' => false,
+        'requestId' => $request_id,
         'error' => $e->getMessage()
     ]);
 }

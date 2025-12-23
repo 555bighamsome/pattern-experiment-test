@@ -2372,29 +2372,17 @@ function endFreePlayMode() {
             });
         }
         
-        // Update button text based on condition
+        // Completion button should always be a simple Continue (no "Submit Data")
         const submitBtn = document.querySelector('#freeplayCompletionModal button[onclick="handleFreeplayCompletion()"]');
         if (submitBtn) {
-            if (condition === 'freeplayFirst') {
-                submitBtn.innerHTML = '→ Continue to Puzzle Phase';
-                submitBtn.style.background = '#10b981'; // Green for continue
-            } else {
-                submitBtn.innerHTML = '✓ Submit Data';
-                submitBtn.style.background = '#3b82f6'; // Blue for submit
-            }
+            submitBtn.innerHTML = '→ Continue';
+            submitBtn.style.background = '#3b82f6'; // Blue
         }
         
-        // Update completion message based on condition
+        // Hide the caption text under the button (requested)
         const completionMsg = document.getElementById('freeplayCompletionMessage');
         if (completionMsg) {
-            if (condition === 'freeplayFirst') {
-                // Hide the message for freeplayFirst (not the final phase)
-                completionMsg.style.display = 'none';
-            } else {
-                // Show the message for puzzleFirst (this is the final phase)
-                completionMsg.style.display = 'block';
-                completionMsg.textContent = 'Your complete experiment data will be submitted to the server.';
-            }
+            completionMsg.style.display = 'none';
         }
         
         // Formal experiment: no email/download fallback UI.

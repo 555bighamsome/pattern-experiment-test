@@ -1,7 +1,9 @@
 // dataSubmission.js - Handle automatic data submission to server
 
 // PHP endpoint (server-side)
-const API_ENDPOINT = 'https://bococo-81.inf.ed.ac.uk/api/save_data.php';
+// NOTE: On the server, `save_data.php` lives at the site root.
+// If you change the deployment path, update this URL to match.
+const API_ENDPOINT = 'https://bococo-81.inf.ed.ac.uk/save_data.php';
 
 /**
  * Submit experiment data to server
