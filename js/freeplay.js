@@ -2140,11 +2140,11 @@ function bindButtonInteractions() {
         }
     });
     
-    // Start 10-minute auto-end timer (hidden from user)
-    const FREEPLAY_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
-    console.log('Starting 10-minute freeplay timer...');
+    // Start 5-minute auto-end timer (hidden from user)
+    const FREEPLAY_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+    console.log('Starting 5-minute freeplay timer...');
     setTimeout(() => {
-        console.log('10 minutes elapsed - auto-ending freeplay mode');
+        console.log('5 minutes elapsed - auto-ending freeplay mode');
         endFreePlayMode();
     }, FREEPLAY_DURATION);
 }
