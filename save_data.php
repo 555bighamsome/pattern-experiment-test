@@ -108,18 +108,31 @@ try {
             $freeplayObj['prolificId'] = $prolific_id;
         }
     }
+    
+    // Extract debrief data (it may be embedded in taskData or freeplayData)
+    // and REMOVE it from task/freeplay to avoid duplicate storage
+    $debriefObj = null;
+    if (is_array($taskObj) && isset($taskObj['debrief'])) {
+        $debriefObj = $taskObj['debrief'];
+        unset($taskObj['debrief']);  // Remove debrief from task data
+    } elseif (is_array($freeplayObj) && isset($freeplayObj['debrief'])) {
+        $debriefObj = $freeplayObj['debrief'];
+        unset($freeplayObj['debrief']);  // Remove debrief from freeplay data
+    }
+    $debrief_data = $debriefObj !== null ? json_encode($debriefObj) : null;
+    
     $task_data = $taskObj !== null ? json_encode($taskObj) : null;
     $freeplay_data = $freeplayObj !== null ? json_encode($freeplayObj) : null;
     $user_agent = isset($data['userAgent']) ? $data['userAgent'] : $_SERVER['HTTP_USER_AGENT'];
     $screen_resolution = isset($data['screenResolution']) ? $data['screenResolution'] : null;
 
     // Insert into database
-    // Try with prolific_id column first; if that column does not exist, fall back.
+    // Try with prolific_id and debrief_data columns first; if columns don't exist, fall back.
     try {
         $sql = "INSERT INTO experiment_data 
-            (participant_id, prolific_id, `condition`, task_data, freeplay_data, user_agent, screen_resolution) 
+            (participant_id, prolific_id, `condition`, task_data, freeplay_data, debrief_data, user_agent, screen_resolution) 
             VALUES 
-            (:participant_id, :prolific_id, :condition, :task_data, :freeplay_data, :user_agent, :screen_resolution)";
+            (:participant_id, :prolific_id, :condition, :task_data, :freeplay_data, :debrief_data, :user_agent, :screen_resolution)";
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
@@ -128,29 +141,33 @@ try {
             ':condition' => $condition,
             ':task_data' => $task_data,
             ':freeplay_data' => $freeplay_data,
+            ':debrief_data' => $debrief_data,
             ':user_agent' => $user_agent,
             ':screen_resolution' => $screen_resolution
         ]);
     } catch (PDOException $e) {
-        // Unknown column 'prolific_id' => fallback insert without it.
-        if (strpos($e->getMessage(), 'prolific_id') === false) {
+        // Unknown column 'prolific_id' or 'debrief_data' => try fallback without them
+        $errorMsg = $e->getMessage();
+        
+        if (strpos($errorMsg, 'prolific_id') !== false || strpos($errorMsg, 'debrief_data') !== false) {
+            // Try without both new columns
+            $sql = "INSERT INTO experiment_data 
+                (participant_id, `condition`, task_data, freeplay_data, user_agent, screen_resolution) 
+                VALUES 
+                (:participant_id, :condition, :task_data, :freeplay_data, :user_agent, :screen_resolution)";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':participant_id' => $participant_id,
+                ':condition' => $condition,
+                ':task_data' => $task_data,
+                ':freeplay_data' => $freeplay_data,
+                ':user_agent' => $user_agent,
+                ':screen_resolution' => $screen_resolution
+            ]);
+        } else {
             throw $e;
         }
-
-        $sql = "INSERT INTO experiment_data 
-            (participant_id, `condition`, task_data, freeplay_data, user_agent, screen_resolution) 
-            VALUES 
-            (:participant_id, :condition, :task_data, :freeplay_data, :user_agent, :screen_resolution)";
-        
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            ':participant_id' => $participant_id,
-            ':condition' => $condition,
-            ':task_data' => $task_data,
-            ':freeplay_data' => $freeplay_data,
-            ':user_agent' => $user_agent,
-            ':screen_resolution' => $screen_resolution
-        ]);
     }
 
     $insert_id = $pdo->lastInsertId();

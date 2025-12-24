@@ -19,7 +19,7 @@
         <div style="margin-top: 0.75rem;">
           <label style="display:block; font-weight:600;" for="age">1. How old are you?</label>
           <div style="display:flex; align-items:center; gap: 0.5rem; margin-top: 0.35rem;">
-            <input id="age" name="age" type="number" min="0" max="120" required style="width: 70px; padding: 0.35rem 0.45rem;" />
+            <input id="age" name="age" type="number" min="18" max="100" required style="width: 70px; padding: 0.35rem 0.45rem;" />
             <span>years</span>
           </div>
         </div>
@@ -71,18 +71,16 @@
         </div>
 
         <div style="margin-top: 0.95rem;">
-          <label style="display:block; font-weight:600;" for="strategy">5. What are your strategies in playing with the machines?</label>
-          <textarea id="strategy" name="strategy" rows="4" required placeholder="Please type here" style="width:100%; box-sizing:border-box; padding: 0.75rem; margin-top: 0.35rem;"></textarea>
-        </div>
-
-        <div style="margin-top: 0.95rem;">
-          <label style="display:block; font-weight:600;" for="fusion_opinion">6. How often do fusions work out in this game, in your opinion?</label>
-          <textarea id="fusion_opinion" name="fusion_opinion" rows="4" required placeholder="Please type here" style="width:100%; box-sizing:border-box; padding: 0.75rem; margin-top: 0.35rem;"></textarea>
-        </div>
-
-        <div style="margin-top: 0.95rem;">
-          <label style="display:block; font-weight:600;" for="comments">7. Do you have any comments regarding the experiment?</label>
-          <textarea id="comments" name="comments" rows="4" required placeholder="Please type here" style="width:100%; box-sizing:border-box; padding: 0.75rem; margin-top: 0.35rem;"></textarea>
+          <label style="display:block; font-weight:600;" for="helper_usefulness">5. Did you find the helpers (saved patterns) useful?</label>
+          <select id="helper_usefulness" name="helper_usefulness" required style="width: 340px; padding: 0.35rem 0.45rem; margin-top: 0.35rem;">
+            <option value="" selected></option>
+            <option value="very_useful">Very useful</option>
+            <option value="somewhat_useful">Somewhat useful</option>
+            <option value="neutral">Neutral</option>
+            <option value="not_very_useful">Not very useful</option>
+            <option value="not_useful">Not useful at all</option>
+            <option value="did_not_use">I did not use helpers</option>
+          </select>
         </div>
       </form>
 
@@ -97,7 +95,7 @@
       <h2 style="margin-top:0;">Complete ✅</h2>
       <p style="margin: 0.25rem 0 0;">Your completion code is:</p>
       <div style="display:flex; align-items:center; gap: 0.75rem; margin-top: 0.75rem;">
-        <div id="completion-code" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.4rem; font-weight: 700; color:#1e40af;">CWWHERKO</div>
+        <div id="completion-code" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.4rem; font-weight: 700; color:#1e40af;">XXXXXXXX</div>
         <button class="btn btn-primary" id="copy-code" type="button">Copy</button>
       </div>
       <p style="margin-top: 0.75rem; color:#475569;">
